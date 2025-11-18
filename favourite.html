@@ -467,6 +467,38 @@
     <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
 
     <script>
+        // Helper function to fetch with CORS proxy fallback
+        const fetchWithProxy = async (url) => {
+            try {
+                // Try direct fetch first
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Direct fetch failed');
+                return await response.json();
+            } catch (error) {
+                // Fallback to CORS proxy
+                console.log('Using CORS proxy for:', url);
+                try {
+                    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+                    const response = await fetch(proxyUrl);
+                    if (!response.ok) throw new Error('Proxy fetch failed');
+                    const text = await response.text();
+                    return JSON.parse(text);
+                } catch (proxyError) {
+                    console.error('Both direct and proxy fetch failed:', error, proxyError);
+                    // Try alternative proxy
+                    try {
+                        const altProxy = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+                        const response = await fetch(altProxy);
+                        if (!response.ok) throw new Error('Alternative proxy failed');
+                        return await response.json();
+                    } catch (altError) {
+                        console.error('All fetch attempts failed:', altError);
+                        throw new Error('Unable to fetch data from API');
+                    }
+                }
+            }
+        };
+
         // Entrance animations
         anime({
             targets: '.header',
@@ -643,8 +675,7 @@
         async function fetchOMDBData(query, type) {
             const apiKey = "6c6fb997";
             const url = `https://www.omdbapi.com/?s=${encodeURIComponent(query)}&type=${type}&apikey=${apiKey}`;
-            const response = await fetch(url);
-            const data = await response.json();
+            const data = await fetchWithProxy(url);
             return data.Search ? data.Search.map(movie => ({ name: movie.Title })) : [];
         }
 

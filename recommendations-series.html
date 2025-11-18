@@ -429,6 +429,38 @@
     <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-database-compat.js"></script>
 
     <script>
+        // Helper function to fetch with CORS proxy fallback
+        const fetchWithProxy = async (url) => {
+            try {
+                // Try direct fetch first
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Direct fetch failed');
+                return await response.json();
+            } catch (error) {
+                // Fallback to CORS proxy
+                console.log('Using CORS proxy for:', url);
+                try {
+                    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+                    const response = await fetch(proxyUrl);
+                    if (!response.ok) throw new Error('Proxy fetch failed');
+                    const text = await response.text();
+                    return JSON.parse(text);
+                } catch (proxyError) {
+                    console.error('Both direct and proxy fetch failed:', error, proxyError);
+                    // Try alternative proxy
+                    try {
+                        const altProxy = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+                        const response = await fetch(altProxy);
+                        if (!response.ok) throw new Error('Alternative proxy failed');
+                        return await response.json();
+                    } catch (altError) {
+                        console.error('All fetch attempts failed:', altError);
+                        throw new Error('Unable to fetch data from API');
+                    }
+                }
+            }
+        };
+
         anime({
             targets: '.header',
             translateY: [-30, 0],
@@ -523,8 +555,7 @@
             
             try {
                 const promises = popularSeries.map(series => 
-                    fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(series)}&type=series&apikey=${apiKey}`)
-                        .then(res => res.json())
+                    fetchWithProxy(`https://www.omdbapi.com/?t=${encodeURIComponent(series)}&type=series&apikey=${apiKey}`)
                 );
                 
                 const results = await Promise.all(promises);
@@ -607,13 +638,11 @@
         async function searchSeries(query) {
             const apiKey = "6c6fb997";
             const url = `https://www.omdbapi.com/?s=${encodeURIComponent(query)}&type=series&apikey=${apiKey}`;
-            const response = await fetch(url);
-            const data = await response.json();
+            const data = await fetchWithProxy(url);
             
             if (data.Response === 'True') {
                 const promises = data.Search.slice(0, 12).map(series => 
-                    fetch(`https://www.omdbapi.com/?i=${series.imdbID}&type=series&apikey=${apiKey}`)
-                        .then(res => res.json())
+                    fetchWithProxy(`https://www.omdbapi.com/?i=${series.imdbID}&type=series&apikey=${apiKey}`)
                 );
                 const results = await Promise.all(promises);
                 return results.filter(series => series.Response === 'True');

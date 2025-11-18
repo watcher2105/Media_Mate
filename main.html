@@ -759,12 +759,16 @@
                     loadSection(section, query);
                 };
 
-                    const escapeHtmlText = (value = '') => value
-                        .replace(/&/g, '&amp;')
-                        .replace(/</g, '&lt;')
-                        .replace(/>/g, '&gt;')
-                        .replace(/"/g, '&quot;')
-                        .replace(/'/g, '&#39;');
+                    const escapeHtmlText = (value = '') => {
+                        // Convert to string and handle null/undefined
+                        const str = value === null || value === undefined ? '' : String(value);
+                        return str
+                            .replace(/&/g, '&amp;')
+                            .replace(/</g, '&lt;')
+                            .replace(/>/g, '&gt;')
+                            .replace(/"/g, '&quot;')
+                            .replace(/'/g, '&#39;');
+                    };
 
                     const sanitizePosterUrl = (poster) => (
                         poster && poster !== 'N/A'
@@ -1083,8 +1087,8 @@
                                 params.set('type', type);
                             }
 
-                            const response = await fetch(`https://www.omdbapi.com/?${params.toString()}`);
-                            const data = await response.json();
+                            const url = `https://www.omdbapi.com/?${params.toString()}`;
+                            const data = await fetchWithProxy(url);
                             if (data.Response !== 'True') {
                                 console.warn(`OMDB: Movie not found - ${title}`);
                                 return null;
@@ -1159,9 +1163,10 @@
                                 Year: track.album.release_date?.split('-')[0] || 'N/A',
                                 Type: 'music',
                                 Plot: `${track.album.name} - ${track.artists.map(a => a.name).join(', ')}`,
-                                id: track.id,
-                                spotifyUrl: track.external_urls?.spotify || '',
-                                albumId: track.album.id
+                                id: track.album.id || '',  // Use album ID for details, not track ID
+                                albumId: track.album.id || '',
+                                trackId: track.id || '',
+                                spotifyUrl: track.external_urls?.spotify || ''
                             };
                         } catch (error) {
                             console.error(`Error fetching track from Spotify: ${artist} - ${song}`, error);
@@ -1614,12 +1619,43 @@
         let currentMusicIndex = 0;
         let currentBookIndex = 0;
 
+        // Helper function to fetch with CORS proxy fallback
+        const fetchWithProxy = async (url) => {
+            try {
+                // Try direct fetch first
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Direct fetch failed');
+                return await response.json();
+            } catch (error) {
+                // Fallback to CORS proxy
+                console.log('Using CORS proxy for:', url);
+                try {
+                    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+                    const response = await fetch(proxyUrl);
+                    if (!response.ok) throw new Error('Proxy fetch failed');
+                    const text = await response.text();
+                    return JSON.parse(text);
+                } catch (proxyError) {
+                    console.error('Both direct and proxy fetch failed:', error, proxyError);
+                    // Try alternative proxy
+                    try {
+                        const altProxy = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+                        const response = await fetch(altProxy);
+                        if (!response.ok) throw new Error('Alternative proxy failed');
+                        return await response.json();
+                    } catch (altError) {
+                        console.error('All fetch attempts failed:', altError);
+                        throw new Error('Unable to fetch data from API');
+                    }
+                }
+            }
+        };
+
         const fetchMovies = async (query = '') => {
             if (query) {
                 // Search mode
                 const url = `https://www.omdbapi.com/?apikey=6c6fb997&s=${query}&type=movie`;
-                fetch(url)
-                    .then(res => res.json())
+                fetchWithProxy(url)
                     .then(data => displayItems(data.Search || [], 'movies', {
                         containerId: 'movies-results',
                         replace: true,
@@ -1633,8 +1669,7 @@
             } else {
                 // Popular mode - fetch multiple terms
                 const promises = popularMovieTerms.map(term => 
-                    fetch(`https://www.omdbapi.com/?apikey=6c6fb997&s=${term}&type=movie`)
-                        .then(res => res.json())
+                    fetchWithProxy(`https://www.omdbapi.com/?apikey=6c6fb997&s=${term}&type=movie`)
                         .then(data => data.Search || [])
                         .catch(() => [])
                 );
@@ -1663,8 +1698,7 @@
             if (query) {
                 // Search mode
                 const url = `https://www.omdbapi.com/?apikey=6c6fb997&s=${query}&type=series`;
-                fetch(url)
-                    .then(res => res.json())
+                fetchWithProxy(url)
                     .then(data => displayItems(data.Search || [], 'webseries', {
                         containerId: 'webseries-results',
                         replace: true,
@@ -1678,8 +1712,7 @@
             } else {
                 // Popular mode - fetch multiple terms
                 const promises = popularSeriesTerms.map(term => 
-                    fetch(`https://www.omdbapi.com/?apikey=6c6fb997&s=${term}&type=series`)
-                        .then(res => res.json())
+                    fetchWithProxy(`https://www.omdbapi.com/?apikey=6c6fb997&s=${term}&type=series`)
                         .then(data => data.Search || [])
                         .catch(() => [])
                 );
@@ -1711,32 +1744,31 @@
                 if (query) {
                     // Search mode
                     const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=album&limit=50`;
-                    fetch(url, {
+                    const response = await fetch(url, {
                         headers: { 'Authorization': `Bearer ${token}` }
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        const albumItems = data.albums?.items || [];
-                        const items = albumItems.map(album => ({
-                            Title: album.name,
-                            Poster: album.images?.[0]?.url || '',
-                            id: album.id || '',
-                            artists: (album.artists || []).map(artist => artist.name),
-                            releaseDate: album.release_date || '',
-                            totalTracks: album.total_tracks || 0,
-                            spotifyUrl: album.external_urls?.spotify || ''
-                        }));
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Spotify API request failed');
+                    }
+                    
+                    const data = await response.json();
+                    const albumItems = data.albums?.items || [];
+                    const items = albumItems.map(album => ({
+                        Title: album.name,
+                        Poster: album.images?.[0]?.url || 'https://via.placeholder.com/300x300/1a1a2e/ffffff?text=No+Cover',
+                        id: album.id || '',
+                        artists: (album.artists || []).map(artist => artist.name),
+                        releaseDate: album.release_date || '',
+                        totalTracks: album.total_tracks || 0,
+                        spotifyUrl: album.external_urls?.spotify || ''
+                    }));
 
-                        displayItems(items, 'music', {
-                            containerId: 'music-results',
-                            replace: true,
-                            heading: 'Search Results',
-                            emptyMessage: 'No albums matched your search.'
-                        });
-                    })
-                    .catch(err => {
-                        console.error("Error fetching music:", err);
-                        showContainerMessage('music-results', 'Unable to load music right now.');
+                    displayItems(items, 'music', {
+                        containerId: 'music-results',
+                        replace: true,
+                        heading: 'Search Results',
+                        emptyMessage: 'No albums matched your search.'
                     });
                 } else {
                     // Popular mode - fetch from multiple genres
@@ -1744,20 +1776,31 @@
                         fetch(`https://api.spotify.com/v1/search?q=genre:${genre}&type=album&limit=20`, {
                             headers: { 'Authorization': `Bearer ${token}` }
                         })
-                        .then(res => res.json())
+                        .then(res => {
+                            if (!res.ok) throw new Error('Failed to fetch genre');
+                            return res.json();
+                        })
                         .then(data => data.albums?.items || [])
-                        .catch(() => [])
+                        .catch(err => {
+                            console.error(`Error fetching ${genre}:`, err);
+                            return [];
+                        })
                     );
 
                     Promise.all(promises)
                         .then(results => {
                             const allAlbums = results.flat();
+                            
+                            if (allAlbums.length === 0) {
+                                throw new Error('No albums retrieved from Spotify');
+                            }
+                            
                             // Remove duplicates based on id
                             const uniqueAlbums = Array.from(new Map(allAlbums.map(a => [a.id, a])).values());
                             
                             const items = uniqueAlbums.map(album => ({
                                 Title: album.name,
-                                Poster: album.images?.[0]?.url || '',
+                                Poster: album.images?.[0]?.url || 'https://via.placeholder.com/300x300/1a1a2e/ffffff?text=No+Cover',
                                 id: album.id || '',
                                 artists: (album.artists || []).map(artist => artist.name),
                                 releaseDate: album.release_date || '',
@@ -1774,12 +1817,12 @@
                         })
                         .catch(err => {
                             console.error("Error fetching music:", err);
-                            showContainerMessage('music-results', 'Unable to load music right now.');
+                            showContainerMessage('music-results', 'Unable to load music from Spotify. Please try searching for specific albums.');
                         });
                 }
             } catch (err) {
-                console.error("Error with Spotify token:", err);
-                showContainerMessage('music-results', 'Unable to load music right now.');
+                console.error("Error with Spotify:", err);
+                showContainerMessage('music-results', 'Unable to connect to Spotify API. The music service may be temporarily unavailable.');
             }
         };
 
@@ -2028,8 +2071,8 @@
                         }
                     }
 
-                    const response = await fetch(`https://www.omdbapi.com/?${params.toString()}`);
-                    const data = await response.json();
+                    const url = `https://www.omdbapi.com/?${params.toString()}`;
+                    const data = await fetchWithProxy(url);
 
                     if (data.Response !== 'True') {
                         throw new Error(data.Error || 'Unable to load movie details.');
@@ -2125,58 +2168,82 @@
                         ${previewLink}
                     `;
                 } else if (normalizedType === 'music') {
-                    if (!sourceId) {
+                    if (!sourceId || sourceId.trim() === '') {
                         setDetailContent(`
                             <div class="detail-header">
                                 <img class="detail-poster" src="${escapeHtmlText(coverImage)}" alt="${escapeHtmlText(displayTitle)}">
                                 <div class="detail-meta">
                                     <h2>${escapeHtmlText(displayTitle)}</h2>
-                                    <p>No additional information available.</p>
+                                    <p>No album ID available. Cannot load detailed information.</p>
                                 </div>
                             </div>
                         `);
                         return;
                     }
 
-                    const token = await getSpotifyToken();
-                    const response = await fetch(`https://api.spotify.com/v1/albums/${sourceId}`, {
-                        headers: {
-                            Authorization: `Bearer ${token}`
+                    try {
+                        const token = await getSpotifyToken();
+                        const response = await fetch(`https://api.spotify.com/v1/albums/${sourceId}`, {
+                            headers: {
+                                Authorization: `Bearer ${token}`
+                            }
+                        });
+                        
+                        if (!response.ok) {
+                            if (response.status === 404) {
+                                throw new Error('Album not found on Spotify. The album ID may be invalid or the album may have been removed.');
+                            }
+                            throw new Error(`Spotify API error: ${response.status}`);
                         }
-                    });
-                    const album = await response.json();
-                    if (album.error) {
-                        throw new Error(album.error.message || 'Unable to load album details.');
-                    }
+                        
+                        const album = await response.json();
+                        
+                        if (album.error) {
+                            throw new Error(album.error.message || 'Unable to load album details.');
+                        }
 
-                    const posterUrl = sanitizePosterUrl(album.images?.[0]?.url || coverImage);
-                    const artists = (album.artists || []).map(artist => artist.name).join(', ');
-                    const releaseDate = album.release_date || '';
-                    const totalTracks = album.total_tracks || 0;
-                    const spotifyLink = album.external_urls?.spotify
-                        ? `<p><a href="${escapeHtmlText(album.external_urls.spotify)}" target="_blank" rel="noopener noreferrer">Open in Spotify</a></p>`
-                        : '';
-                    const tracks = Array.isArray(album.tracks?.items) ? album.tracks.items : [];
-                    const trackList = tracks.length
-                        ? `<ol class="detail-list">${tracks.map(track => `<li>${escapeHtmlText(track.name)}${track.duration_ms ? ` – ${escapeHtmlText(formatDuration(track.duration_ms))}` : ''}</li>`).join('')}</ol>`
-                        : '<p>No track list available.</p>';
+                        const posterUrl = sanitizePosterUrl(album.images?.[0]?.url || coverImage);
+                        const artists = (album.artists || []).map(artist => artist.name).join(', ');
+                        const releaseDate = album.release_date || '';
+                        const totalTracks = album.total_tracks || 0;
+                        const spotifyLink = album.external_urls?.spotify
+                            ? `<p><a href="${escapeHtmlText(album.external_urls.spotify)}" target="_blank" rel="noopener noreferrer">Open in Spotify</a></p>`
+                            : '';
+                        const tracks = Array.isArray(album.tracks?.items) ? album.tracks.items : [];
+                        const trackList = tracks.length
+                            ? `<ol class="detail-list">${tracks.map(track => `<li>${escapeHtmlText(track.name)}${track.duration_ms ? ` – ${formatDuration(track.duration_ms)}` : ''}</li>`).join('')}</ol>`
+                            : '<p>No track list available.</p>';
 
-                    detailHtml = `
-                        <div class="detail-header">
-                            <img class="detail-poster" src="${escapeHtmlText(posterUrl)}" alt="${escapeHtmlText(album.name || displayTitle)}">
-                            <div class="detail-meta">
-                                <h2>${escapeHtmlText(album.name || displayTitle)}</h2>
-                                ${artists ? `<p><strong>Artist(s):</strong> ${escapeHtmlText(artists)}</p>` : ''}
-                                ${releaseDate ? `<p><strong>Release Date:</strong> ${escapeHtmlText(releaseDate)}</p>` : ''}
-                                ${totalTracks ? `<p><strong>Total Tracks:</strong> ${escapeHtmlText(totalTracks)}</p>` : ''}
-                                ${spotifyLink}
+                        detailHtml = `
+                            <div class="detail-header">
+                                <img class="detail-poster" src="${escapeHtmlText(posterUrl)}" alt="${escapeHtmlText(album.name || displayTitle)}">
+                                <div class="detail-meta">
+                                    <h2>${escapeHtmlText(album.name || displayTitle)}</h2>
+                                    ${artists ? `<p><strong>Artist(s):</strong> ${escapeHtmlText(artists)}</p>` : ''}
+                                    ${releaseDate ? `<p><strong>Release Date:</strong> ${escapeHtmlText(releaseDate)}</p>` : ''}
+                                    ${totalTracks ? `<p><strong>Total Tracks:</strong> ${totalTracks}</p>` : ''}
+                                    ${spotifyLink}
+                                </div>
                             </div>
-                        </div>
-                        <div class="detail-section">
-                            <h3>Track List</h3>
-                            ${trackList}
-                        </div>
-                    `;
+                            <div class="detail-section">
+                                <h3>Track List</h3>
+                                ${trackList}
+                            </div>
+                        `;
+                    } catch (musicError) {
+                        console.error('Error fetching album details from Spotify:', musicError);
+                        // Fallback to basic info if Spotify fails
+                        detailHtml = `
+                            <div class="detail-header">
+                                <img class="detail-poster" src="${escapeHtmlText(coverImage)}" alt="${escapeHtmlText(displayTitle)}">
+                                <div class="detail-meta">
+                                    <h2>${escapeHtmlText(displayTitle)}</h2>
+                                    <p><strong>Note:</strong> ${escapeHtmlText(musicError.message || 'Unable to load detailed information from Spotify.')}</p>
+                                    ${sourceId ? `<p style="font-size: 0.9em; color: #888;">Album ID: ${escapeHtmlText(sourceId)}</p>` : ''}
+                                </div>
+                            </div>
+                        `;
+                    }
                 } else {
                     detailHtml = `
                         <div class="detail-header">
@@ -2310,16 +2377,27 @@
     window.performSearch = performSearch;
 
         const getSpotifyToken = async () => {
-            const response = await fetch('https://accounts.spotify.com/api/token', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'Authorization': `Basic ${btoa('4acfb5c3c58448a3a6fc909910dc0282:f7fbb11f27954ab08687ff32dfdbecfb')}`
-                },
-                body: 'grant_type=client_credentials'
-            });
-            const data = await response.json();
-            return data.access_token;
+            try {
+                const response = await fetch('https://accounts.spotify.com/api/token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Authorization': `Basic ${btoa('4acfb5c3c58448a3a6fc909910dc0282:f7fbb11f27954ab08687ff32dfdbecfb')}`
+                    },
+                    body: 'grant_type=client_credentials'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to get Spotify token');
+                }
+                
+                const data = await response.json();
+                return data.access_token;
+            } catch (error) {
+                console.error('Error getting Spotify token:', error);
+                // Spotify API might have CORS issues, return null and handle gracefully
+                throw new Error('Unable to authenticate with Spotify API');
+            }
         };
 
         // Add event listeners to side menu items
@@ -2614,8 +2692,8 @@
             }
 
             try {
-                const response = await fetch(`https://www.omdbapi.com/?${params.toString()}`);
-                const data = await response.json();
+                const url = `https://www.omdbapi.com/?${params.toString()}`;
+                const data = await fetchWithProxy(url);
 
                 if (data.Response === "True" && data.Poster && data.Poster !== "N/A") {
                     return {
