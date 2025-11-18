@@ -131,7 +131,7 @@
         toggleButton.style.display = "none";
       } else {
         bot.style.display = "none";
-        toggleButton.style.display = "block";
+        toggleButton.style.display = "flex";
       }
     }
 
@@ -143,6 +143,9 @@
         return;
       }
 
+      const outputDiv = document.getElementById("output");
+      outputDiv.innerText = "Generating response...";
+
       const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
       try {
@@ -150,14 +153,21 @@
         const response = await result.response;
         const text = await response.text();
 
-        document.getElementById("output").innerText = text;
+        outputDiv.innerText = text;
       } catch (error) {
         console.error("Error generating content:", error);
-        document.getElementById("output").innerText = "Error generating content. Please try again later.";
+        outputDiv.innerText = "Error generating content. Please try again later.";
       }
     }
 
     document.getElementById("generateButton").addEventListener("click", run);
+
+    // Add Enter key support for input
+    document.getElementById("questionInput").addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        run();
+      }
+    });
 
     // Add event listener for the toggle button
     document.getElementById("botToggle").addEventListener("click", window.toggleBot);
