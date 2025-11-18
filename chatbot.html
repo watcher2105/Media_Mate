@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MediaMate</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "@google/generative-ai": "https://esm.run/@google/generative-ai"
+      }
+    }
+  </script>
+  <style>
+    /* Chatbot Widget Styles */
+    .media-mate-widget {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 300px;
+      max-width: 90%;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      overflow: hidden;
+      display: none;
+      flex-direction: column;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      z-index: 1000;
+    }
+
+    .media-mate-header {
+      background-color: #007bff;
+      color: white;
+      padding: 10px;
+      font-size: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .media-mate-header button {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .media-mate-content {
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .media-mate-content input {
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+
+    .media-mate-content button {
+      padding: 8px 12px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .media-mate-output {
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+
+    .media-mate-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 20px;
+      cursor: pointer;
+      z-index: 999;
+    }
+  </style>
+</head>
+<body>
+  <!-- Chatbot Toggle Button -->
+  <button class="media-mate-toggle" id="botToggle">💬</button>
+
+  <!-- Chatbot Widget -->
+  <div class="media-mate-widget" id="mediaMate">
+    <div class="media-mate-header">
+      <span>MediaMate</span>
+      <button onclick="toggleBot()">×</button>
+    </div>
+    <div class="media-mate-content">
+      <input type="text" id="questionInput" placeholder="Enter your question...">
+      <button id="generateButton">Generate</button>
+      <div class="media-mate-output" id="output"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { GoogleGenerativeAI } from "@google/generative-ai";
+
+    const API_KEY = "AIzaSyBNWkMKFI1Ef-Kfboy5uXv4M79LYWjAW2U";
+
+    const genAI = new GoogleGenerativeAI(API_KEY);
+
+    // Function to toggle the chatbot widget
+    window.toggleBot = function() {
+      const bot = document.getElementById("mediaMate");
+      const toggleButton = document.getElementById("botToggle");
+      if (bot.style.display === "none" || !bot.style.display) {
+        bot.style.display = "flex";
+        toggleButton.style.display = "none";
+      } else {
+        bot.style.display = "none";
+        toggleButton.style.display = "block";
+      }
+    }
+
+    async function run() {
+      const question = document.getElementById("questionInput").value.trim();
+
+      if (!question) {
+        alert("Please enter a question.");
+        return;
+      }
+
+      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
+      try {
+        const result = await model.generateContent(question);
+        const response = await result.response;
+        const text = await response.text();
+
+        document.getElementById("output").innerText = text;
+      } catch (error) {
+        console.error("Error generating content:", error);
+        document.getElementById("output").innerText = "Error generating content. Please try again later.";
+      }
+    }
+
+    document.getElementById("generateButton").addEventListener("click", run);
+
+    // Add event listener for the toggle button
+    document.getElementById("botToggle").addEventListener("click", window.toggleBot);
+  </script>
+</body>
+</html>

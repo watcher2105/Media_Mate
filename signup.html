@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediaMate - Sign Up</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
+            padding: 40px 20px;
+        }
+
+        .bg-animation {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .bg-circle:nth-child(1) {
+            width: 350px;
+            height: 350px;
+            top: -150px;
+            right: -150px;
+            animation-delay: 0s;
+        }
+
+        .bg-circle:nth-child(2) {
+            width: 250px;
+            height: 250px;
+            bottom: -100px;
+            left: -100px;
+            animation-delay: 3s;
+        }
+
+        .bg-circle:nth-child(3) {
+            width: 180px;
+            height: 180px;
+            top: 40%;
+            right: 15%;
+            animation-delay: 6s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(30px, -50px) scale(1.1);
+            }
+            66% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+        }
+
+        .signup-container {
+            position: relative;
+            z-index: 1;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 50px 50px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .logo-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 35px;
+            margin-bottom: 15px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        h2 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #718096;
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 13px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #fff;
+            color: #2d3748;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 42px;
+            cursor: pointer;
+            color: #718096;
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+            user-select: none;
+        }
+
+        .password-toggle:hover {
+            color: #667eea;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 25px 0;
+            color: #718096;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e2e8f0;
+        }
+
+        .divider span {
+            padding: 0 15px;
+            font-size: 0.85rem;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #718096;
+            font-size: 0.95rem;
+        }
+
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .login-link a:hover {
+            color: #764ba2;
+        }
+
+        .back-home {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .back-home:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-5px);
+        }
+
+        .alert {
+            padding: 13px;
+            border-radius: 12px;
+            margin-bottom: 18px;
+            font-size: 0.9rem;
+            animation: slideDown 0.3s ease;
+        }
+
+        .alert-danger {
+            background: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+        }
+
+        .alert-success {
+            background: #efe;
+            color: #3c3;
+            border: 1px solid #cfc;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .signup-container {
+                padding: 35px 25px;
+            }
+
+            h2 {
+                font-size: 1.8rem;
+            }
+
+            .back-home {
+                top: 15px;
+                left: 15px;
+                padding: 10px 18px;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation">
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+    </div>
+
+    <a href="index.html" class="back-home">← Back to Home</a>
+
+    <div class="signup-container">
+        <div class="logo-section">
+            <div class="logo-icon">🎬</div>
+            <h2>Create Account</h2>
+            <p class="subtitle">Join MediaMate for personalized entertainment recommendations</p>
+        </div>
+
+        <div id="alertBox"></div>
+
+        <form id="signupForm">
+            <div class="form-group">
+                <label class="form-label" for="name">Full Name</label>
+                <input type="text" class="form-control" id="name" placeholder="Enter your full name" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="email">Email Address</label>
+                <input type="email" class="form-control" id="email" placeholder="Enter your email" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <input type="password" class="form-control" id="password" placeholder="Create a strong password" required>
+                <span class="password-toggle" onclick="togglePassword('password')">👁️</span>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="confirmPassword">Confirm Password</label>
+                <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm your password" required>
+                <span class="password-toggle" onclick="togglePassword('confirmPassword')">👁️</span>
+            </div>
+
+            <button type="submit" class="btn-primary" id="signupBtn">
+                <span id="btnText">Create Account</span>
+            </button>
+        </form>
+
+        <div class="divider">
+            <span>Already have an account?</span>
+        </div>
+
+        <div class="login-link">
+            <a href="login.html">Login here</a>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-database-compat.js"></script>
+
+    <script>
+        // Initialize animations
+        anime({
+            targets: '.signup-container',
+            translateY: [50, 0],
+            opacity: [0, 1],
+            duration: 1000,
+            easing: 'easeOutExpo'
+        });
+
+        anime({
+            targets: '.logo-icon',
+            scale: [0.8, 1],
+            rotate: [0, 360],
+            duration: 1200,
+            easing: 'easeOutElastic(1, .6)'
+        });
+
+        // Password toggle
+        function togglePassword(fieldId) {
+            const passwordInput = document.getElementById(fieldId);
+            const toggleIcons = document.querySelectorAll('.password-toggle');
+            const targetIcon = Array.from(toggleIcons).find(icon => 
+                icon.previousElementSibling.id === fieldId
+            );
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                targetIcon.textContent = '👁️‍🗨️';
+            } else {
+                passwordInput.type = 'password';
+                targetIcon.textContent = '👁️';
+            }
+        }
+
+        // Show alert
+        function showAlert(message, type = 'danger') {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            
+            setTimeout(() => {
+                alertBox.innerHTML = '';
+            }, 4000);
+        }
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAmCKNLQa5D_VTTDApD5KRPGTxTvuMHZu4",
+            authDomain: "mediamate-7be1d.firebaseapp.com",
+            databaseURL: "https://mediamate-7be1d-default-rtdb.firebaseio.com",
+            projectId: "mediamate-7be1d",
+            storageBucket: "mediamate-7be1d.firebasestorage.app",
+            messagingSenderId: "1070130926077",
+            appId: "1:1070130926077:web:781de2dc1275d193af4994",
+            measurementId: "G-BSV2LSNR6D"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        // Signup Form Handler
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const signupBtn = document.getElementById('signupBtn');
+            const btnText = document.getElementById('btnText');
+
+            // Validation
+            if (!name) {
+                showAlert('Please enter your name.');
+                return;
+            }
+
+            if (password.length < 6) {
+                showAlert('Password must be at least 6 characters long.');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                showAlert('Passwords do not match.');
+                anime({
+                    targets: '.signup-container',
+                    translateX: [
+                        { value: -10, duration: 100 },
+                        { value: 10, duration: 100 },
+                        { value: -10, duration: 100 },
+                        { value: 10, duration: 100 },
+                        { value: 0, duration: 100 }
+                    ],
+                    easing: 'easeInOutQuad'
+                });
+                return;
+            }
+
+            signupBtn.disabled = true;
+            btnText.textContent = 'Creating Account...';
+
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+
+                if (user) {
+                    await database.ref('users/' + user.uid).set({
+                        name: name,
+                        email: email,
+                        createdAt: new Date().toISOString()
+                    });
+
+                    showAlert('Account created successfully! Redirecting...', 'success');
+                    
+                    anime({
+                        targets: '.signup-container',
+                        scale: [1, 0.9],
+                        opacity: [1, 0],
+                        duration: 400,
+                        easing: 'easeInQuad',
+                        complete: () => {
+                            window.location.href = "recommendations-movies.html";
+                        }
+                    });
+                }
+            } catch (error) {
+                signupBtn.disabled = false;
+                btnText.textContent = 'Create Account';
+                
+                let errorMessage = 'An error occurred. Please try again.';
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMessage = 'This email is already registered. Please login instead.';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = 'Invalid email address.';
+                } else if (error.code === 'auth/weak-password') {
+                    errorMessage = 'Password is too weak. Please use a stronger password.';
+                } else if (error.message) {
+                    errorMessage = error.message;
+                }
+                
+                showAlert(errorMessage);
+                
+                anime({
+                    targets: '.signup-container',
+                    translateX: [
+                        { value: -10, duration: 100 },
+                        { value: 10, duration: 100 },
+                        { value: -10, duration: 100 },
+                        { value: 10, duration: 100 },
+                        { value: 0, duration: 100 }
+                    ],
+                    easing: 'easeInOutQuad'
+                });
+            }
+        });
+
+        // Input focus animations
+        document.querySelectorAll('.form-control').forEach(input => {
+            input.addEventListener('focus', function() {
+                anime({
+                    targets: this.previousElementSibling,
+                    translateY: [-5, 0],
+                    duration: 300,
+                    easing: 'easeOutQuad'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

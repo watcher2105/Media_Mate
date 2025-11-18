@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediaMate - Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            margin-bottom: 20px;
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .profile-email {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        .profile-container {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            transition: all 0.4s ease;
+        }
+
+        .profile-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.2);
+        }
+
+        .profile-container h4 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .profile-info {
+            display: grid;
+            gap: 15px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .info-row:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(5px);
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 14px 32px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-main {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-main:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-logout {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-logout:hover {
+            background: rgba(255, 59, 48, 0.8);
+            border-color: rgba(255, 59, 48, 0.8);
+            transform: translateY(-3px);
+        }
+
+        .back-link {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(-5px);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 30px auto;
+            }
+
+            h2 {
+                font-size: 2rem;
+            }
+
+            .profile-container {
+                padding: 25px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .back-link {
+                top: 15px;
+                left: 15px;
+                padding: 10px 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="main.html" class="back-link">← Back to Dashboard</a>
+
+    <div class="container">
+        <div class="profile-header">
+            <div class="profile-avatar">👤</div>
+            <h2 id="profileName">Loading...</h2>
+            <p class="profile-email" id="profileEmail">Loading...</p>
+        </div>
+
+        <!-- Favourites Section -->
+        <div class="profile-container">
+            <h4>🎬 Favourite Movies</h4>
+            <div class="profile-info" id="favouriteMoviesContainer">
+                <p style="color: rgba(255,255,255,0.5);">Loading...</p>
+            </div>
+        </div>
+
+        <div class="profile-container">
+            <h4>📺 Favourite Web Series</h4>
+            <div class="profile-info" id="favouriteSeriesContainer">
+                <p style="color: rgba(255,255,255,0.5);">Loading...</p>
+            </div>
+        </div>
+
+        <div class="profile-container">
+            <h4>🎵 Favourite Music</h4>
+            <div class="profile-info" id="favouriteMusicContainer">
+                <p style="color: rgba(255,255,255,0.5);">Loading...</p>
+            </div>
+        </div>
+
+        <div class="profile-container">
+            <h4>📚 Favourite Books</h4>
+            <div class="profile-info" id="favouriteBooksContainer">
+                <p style="color: rgba(255,255,255,0.5);">Loading...</p>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="button-group">
+            <a href="favourite.html" class="btn btn-main">Update Favourites</a>
+            <button id="logoutBtn" class="btn btn-logout">Logout</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAmCKNLQa5D_VTTDApD5KRPGTxTvuMHZu4",
+            authDomain: "mediamate-7be1d.firebaseapp.com",
+            databaseURL: "https://mediamate-7be1d-default-rtdb.firebaseio.com",
+            projectId: "mediamate-7be1d",
+            storageBucket: "mediamate-7be1d.firebasestorage.app",
+            messagingSenderId: "1070130926077",
+            appId: "1:1070130926077:web:781de2dc1275d193af4994",
+            measurementId: "G-BSV2LSNR6D"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const auth = firebase.auth();
+
+        const profileName = document.getElementById("profileName");
+        const profileEmail = document.getElementById("profileEmail");
+        const logoutBtn = document.getElementById("logoutBtn");
+
+        // Entrance animations
+        anime({
+            targets: '.profile-header',
+            translateY: [-50, 0],
+            opacity: [0, 1],
+            duration: 800,
+            easing: 'easeOutExpo'
+        });
+
+        anime({
+            targets: '.stat-card',
+            translateY: [30, 0],
+            opacity: [0, 1],
+            duration: 600,
+            delay: anime.stagger(100, {start: 200}),
+            easing: 'easeOutExpo'
+        });
+
+        anime({
+            targets: '.profile-container',
+            translateY: [30, 0],
+            opacity: [0, 1],
+            duration: 600,
+            delay: anime.stagger(100, {start: 400}),
+            easing: 'easeOutExpo'
+        });
+
+        anime({
+            targets: '.button-group',
+            translateY: [30, 0],
+            opacity: [0, 1],
+            duration: 600,
+            delay: 800,
+            easing: 'easeOutExpo'
+        });
+
+        // Function to display items in containers
+        function displayItems(containerId, items) {
+            const container = document.getElementById(containerId);
+            if (!items || items.length === 0) {
+                container.innerHTML = '<p style="color: rgba(255,255,255,0.5);">No items selected</p>';
+                return;
+            }
+            
+            let html = '<div style="display: flex; flex-wrap: wrap; gap: 10px;">';
+            items.forEach(item => {
+                html += `
+                    <div style="background: rgba(255,255,255,0.05); 
+                                padding: 8px 16px; 
+                                border-radius: 20px; 
+                                border: 1px solid rgba(102, 126, 234, 0.3);
+                                color: white;
+                                font-size: 0.9rem;">
+                        ${item}
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // Load profile and favourites
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                const userId = user.uid;
+
+                database.ref("users/" + userId).once("value")
+                    .then((snapshot) => {
+                        const data = snapshot.val();
+                        profileName.textContent = data.name || "User";
+                        profileEmail.textContent = data.email || "No email";
+
+                        const favourites = data.favourites || {};
+
+                        // Display items
+                        displayItems('favouriteMoviesContainer', favourites.movies);
+                        displayItems('favouriteSeriesContainer', favourites.series);
+                        displayItems('favouriteMusicContainer', favourites.music);
+                        displayItems('favouriteBooksContainer', favourites.books);
+
+                        // Animate stats count-up
+                        anime({
+                            targets: '.stat-number',
+                            innerHTML: (el) => [0, parseInt(el.textContent)],
+                            duration: 1000,
+                            delay: 600,
+                            round: 1,
+                            easing: 'easeOutExpo'
+                        });
+                    })
+                    .catch((error) => {
+                        console.error("Error fetching profile data:", error);
+                        profileName.textContent = "Error loading profile";
+                    });
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+
+        // Logout
+        logoutBtn.addEventListener("click", () => {
+            auth.signOut().then(() => {
+                window.location.href = "login.html";
+            }).catch((error) => {
+                alert("Error logging out: " + error.message);
+            });
+        });
+    </script>
+</body>
+</html>

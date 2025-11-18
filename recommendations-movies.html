@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediaMate - Select Movies</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 40px 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .bg-circle {
+            position: fixed;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .bg-circle:nth-child(1) {
+            width: 400px;
+            height: 400px;
+            top: -200px;
+            right: -200px;
+            animation: float 25s infinite ease-in-out;
+        }
+
+        .bg-circle:nth-child(2) {
+            width: 300px;
+            height: 300px;
+            bottom: -150px;
+            left: -150px;
+            animation: float 20s infinite ease-in-out reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(120deg); }
+            66% { transform: translate(-20px, 20px) rotate(240deg); }
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .progress-bar-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 25%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+        }
+
+        .step-indicator {
+            text-align: center;
+            margin-bottom: 30px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .logo-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        h2 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 400;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+
+        .progress-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 25px;
+        }
+
+        .progress-badge.complete {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 18px 24px 18px 50px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 15px;
+            color: white;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(102, 126, 234, 0.6);
+            box-shadow: 0 0 25px rgba(102, 126, 234, 0.3);
+        }
+
+        input[type="text"]::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .section-label {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 20px;
+            padding-left: 5px;
+        }
+
+        .posters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 10px 5px;
+        }
+
+        .posters-grid::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .posters-grid::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .posters-grid::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+        }
+
+        .poster-card {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            aspect-ratio: 2/3;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid transparent;
+        }
+
+        .poster-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .poster-card.selected {
+            border-color: #38ef7d;
+            box-shadow: 0 0 20px rgba(56, 239, 125, 0.5);
+        }
+
+        .poster-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .poster-card .poster-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 50%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 15px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .poster-card:hover .poster-overlay {
+            opacity: 1;
+        }
+
+        .poster-card .title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 5px;
+            line-height: 1.3;
+        }
+
+        .poster-card .year {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .poster-card .checkmark {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 35px;
+            height: 35px;
+            background: #38ef7d;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: white;
+            box-shadow: 0 4px 15px rgba(56, 239, 125, 0.5);
+        }
+
+        .poster-card.selected .checkmark {
+            display: flex;
+        }
+
+        .no-poster {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+            font-size: 3rem;
+        }
+
+        .selected-items {
+            margin-top: 25px;
+            padding: 20px 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+            min-height: 60px;
+        }
+
+        .selected-items strong {
+            color: white;
+            font-weight: 600;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 18px 40px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .btn-primary:not(:disabled):hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 15px;
+            }
+
+            h2 {
+                font-size: 2.2rem;
+            }
+
+            .logo-icon {
+                font-size: 60px;
+            }
+
+            .section {
+                padding: 25px;
+            }
+
+            .button-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-circle"></div>
+    <div class="bg-circle"></div>
+
+    <div class="progress-bar-container">
+        <div class="progress-bar"></div>
+    </div>
+
+    <div class="container">
+        <div class="step-indicator">Step 1 of 4</div>
+        
+        <div class="header">
+            <div class="logo-icon">🎬</div>
+            <h2>Select Your Favorite Movies</h2>
+            <p class="subtitle">Choose exactly 3 movies to personalize your recommendations</p>
+        </div>
+
+        <div class="section">
+            <div class="progress-badge" id="progressBadge">0/3 Selected</div>
+            
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="movieSearch" placeholder="Search for your favorite movies...">
+            </div>
+            
+            <div class="section-label">🎬 Latest & Popular Movies</div>
+            <div id="movieGrid" class="posters-grid"></div>
+            
+            <div id="selectedMovies" class="selected-items">
+                <strong>Selected:</strong> None yet
+            </div>
+        </div>
+
+        <div class="button-container">
+            <button class="btn btn-secondary" onclick="window.location.href='login.html'">
+                ← Back
+            </button>
+            <button id="nextBtn" class="btn btn-primary" disabled>
+                Next: Web Series →
+            </button>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-database-compat.js"></script>
+
+    <script>
+        // Entrance animations
+        anime({
+            targets: '.header',
+            translateY: [-30, 0],
+            opacity: [0, 1],
+            duration: 800,
+            easing: 'easeOutExpo'
+        });
+
+        anime({
+            targets: '.section',
+            translateY: [30, 0],
+            opacity: [0, 1],
+            duration: 600,
+            delay: 200,
+            easing: 'easeOutExpo'
+        });
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAmCKNLQa5D_VTTDApD5KRPGTxTvuMHZu4",
+            authDomain: "mediamate-7be1d.firebaseapp.com",
+            databaseURL: "https://mediamate-7be1d-default-rtdb.firebaseio.com",
+            projectId: "mediamate-7be1d",
+            storageBucket: "mediamate-7be1d.firebasestorage.app",
+            messagingSenderId: "1070130926077",
+            appId: "1:1070130926077:web:781de2dc1275d193af4994",
+            measurementId: "G-BSV2LSNR6D"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const auth = firebase.auth();
+
+        let userId;
+        let selectedMovies = [];
+        let allMovies = [];
+
+        // Load existing selections if any
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                userId = user.uid;
+                database.ref("users/" + userId + "/favourites/movies").once('value').then(snapshot => {
+                    if (snapshot.exists()) {
+                        selectedMovies = snapshot.val();
+                        updateUI();
+                    }
+                });
+                loadLatestMovies();
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+
+        const updateUI = () => {
+            const count = selectedMovies.length;
+            const badge = document.getElementById('progressBadge');
+            const nextBtn = document.getElementById('nextBtn');
+            const selectedDiv = document.getElementById('selectedMovies');
+
+            badge.textContent = `${count}/3 Selected`;
+            nextBtn.disabled = count !== 3;
+
+            if (count === 3) {
+                badge.classList.add('complete');
+            } else {
+                badge.classList.remove('complete');
+            }
+
+            if (count === 0) {
+                selectedDiv.innerHTML = '<strong>Selected:</strong> None yet';
+            } else {
+                selectedDiv.innerHTML = `<strong>Selected:</strong> ${selectedMovies.join(", ")}`;
+            }
+
+            // Update poster cards
+            document.querySelectorAll('.poster-card').forEach(card => {
+                const title = card.dataset.title;
+                if (selectedMovies.includes(title)) {
+                    card.classList.add('selected');
+                } else {
+                    card.classList.remove('selected');
+                }
+            });
+        };
+
+        async function loadLatestMovies() {
+            const apiKey = "6c6fb997";
+            const popularMovies = ['Inception', 'Interstellar', 'The Dark Knight', 'Avengers', 'Spiderman', 
+                                   'Iron Man', 'Batman', 'Superman', 'Joker', 'Matrix', 'Titanic', 'Avatar',
+                                   'Gladiator', 'Oppenheimer', 'Barbie', 'Dune'];
+            
+            const movieGrid = document.getElementById('movieGrid');
+            movieGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: rgba(255,255,255,0.5);">Loading movies...</div>';
+            
+            try {
+                const promises = popularMovies.map(movie => 
+                    fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(movie)}&type=movie&apikey=${apiKey}`)
+                        .then(res => res.json())
+                );
+                
+                const results = await Promise.all(promises);
+                allMovies = results.filter(movie => movie.Response === 'True');
+                displayMovies(allMovies);
+            } catch (error) {
+                movieGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: rgba(255,255,255,0.5);">Error loading movies. Please refresh.</div>';
+            }
+        }
+
+        function displayMovies(movies) {
+            const movieGrid = document.getElementById('movieGrid');
+            movieGrid.innerHTML = '';
+
+            if (movies.length === 0) {
+                movieGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: rgba(255,255,255,0.5);">No movies found</div>';
+                return;
+            }
+
+            movies.forEach((movie, index) => {
+                const card = document.createElement('div');
+                card.className = 'poster-card';
+                card.dataset.title = movie.Title;
+                card.style.opacity = '0';
+
+                if (selectedMovies.includes(movie.Title)) {
+                    card.classList.add('selected');
+                }
+
+                const poster = movie.Poster !== 'N/A' 
+                    ? `<img src="${movie.Poster}" alt="${movie.Title}">`
+                    : `<div class="no-poster">🎬</div>`;
+
+                card.innerHTML = `
+                    ${poster}
+                    <div class="poster-overlay">
+                        <div class="title">${movie.Title}</div>
+                        <div class="year">${movie.Year}</div>
+                    </div>
+                    <div class="checkmark">✓</div>
+                `;
+
+                card.addEventListener('click', () => {
+                    if (selectedMovies.includes(movie.Title)) {
+                        selectedMovies = selectedMovies.filter(m => m !== movie.Title);
+                        card.classList.remove('selected');
+                    } else if (selectedMovies.length < 3) {
+                        selectedMovies.push(movie.Title);
+                        card.classList.add('selected');
+                        anime({
+                            targets: card,
+                            scale: [1, 1.1, 1],
+                            duration: 400,
+                            easing: 'easeOutElastic(1, .5)'
+                        });
+                    } else {
+                        anime({
+                            targets: card,
+                            translateX: [0, -10, 10, -10, 10, 0],
+                            duration: 500,
+                            easing: 'easeInOutQuad'
+                        });
+                    }
+                    updateUI();
+                });
+
+                movieGrid.appendChild(card);
+
+                anime({
+                    targets: card,
+                    opacity: [0, 1],
+                    translateY: [20, 0],
+                    duration: 400,
+                    delay: index * 30,
+                    easing: 'easeOutExpo'
+                });
+            });
+        }
+
+        async function searchMovies(query) {
+            const apiKey = "6c6fb997";
+            const url = `https://www.omdbapi.com/?s=${encodeURIComponent(query)}&type=movie&apikey=${apiKey}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            if (data.Response === 'True') {
+                // Fetch full details for each movie
+                const promises = data.Search.slice(0, 12).map(movie => 
+                    fetch(`https://www.omdbapi.com/?i=${movie.imdbID}&type=movie&apikey=${apiKey}`)
+                        .then(res => res.json())
+                );
+                const results = await Promise.all(promises);
+                return results.filter(movie => movie.Response === 'True');
+            }
+            return [];
+        }
+
+        const searchInput = document.getElementById('movieSearch');
+        let searchTimeout;
+
+        searchInput.addEventListener('input', async () => {
+            const query = searchInput.value.trim();
+            
+            clearTimeout(searchTimeout);
+            
+            if (!query) {
+                displayMovies(allMovies);
+                return;
+            }
+
+            searchTimeout = setTimeout(async () => {
+                const results = await searchMovies(query);
+                displayMovies(results);
+            }, 500);
+        });
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            if (!userId || selectedMovies.length !== 3) return;
+
+            const btn = document.getElementById('nextBtn');
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+
+            database.ref("users/" + userId + "/favourites/movies").set(selectedMovies)
+                .then(() => {
+                    anime({
+                        targets: '.section, .header',
+                        scale: [1, 0.95],
+                        opacity: [1, 0],
+                        duration: 400,
+                        easing: 'easeInQuad',
+                        complete: () => {
+                            window.location.href = "recommendations-series.html";
+                        }
+                    });
+                })
+                .catch((error) => {
+                    btn.disabled = false;
+                    btn.textContent = 'Next: Web Series →';
+                    alert("Error saving: " + error.message);
+                });
+        });
+    </script>
+</body>
+</html>

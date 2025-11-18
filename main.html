@@ -1,0 +1,2784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediaMate - Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+        
+        /* Header Styles */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info span {
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 8px 15px;
+            border-radius: 8px;
+        }
+
+        .user-info span:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .user-info button {
+            padding: 8px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-info button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Main Layout */
+        main {
+            display: flex;
+            margin-top: 70px;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* Side Menu */
+        .side-menu {
+            width: 220px;
+            height: calc(100vh - 70px);
+            position: fixed;
+            left: 0;
+            top: 70px;
+            background: rgba(26, 26, 46, 0.6);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(102, 126, 234, 0.2);
+            padding: 30px 0;
+            overflow-y: auto;
+            z-index: 900;
+        }
+
+        .side-menu ul {
+            list-style: none;
+        }
+
+        .side-menu li {
+            padding: 15px 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.7);
+            position: relative;
+        }
+
+        .side-menu li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: height 0.3s ease;
+        }
+
+        .side-menu li:hover,
+        .side-menu li.active {
+            color: white;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .side-menu li:hover::before,
+        .side-menu li.active::before {
+            height: 100%;
+        }
+
+        /* Profile link in side menu */
+        .side-menu li a {
+            color: inherit;
+            text-decoration: none;
+            display: block;
+        }
+
+        /* Content Area */
+        .content {
+            flex: 1;
+            margin-left: 220px;
+            padding: 40px;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* Search Bar */
+        .search-bar {
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .search-bar input {
+            flex: 1;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: rgba(102, 126, 234, 0.6);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .search-bar input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .search-bar button,
+        .btn-primary {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar button:hover,
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Toggle Buttons */
+        .toggle-buttons {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .toggle-btn {
+            padding: 12px 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 25px;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: rgba(102, 126, 234, 0.5);
+            color: white;
+        }
+
+        .toggle-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Section Headings */
+        .recommendation-section h3,
+        .browse-section h3 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+        }
+
+        /* Grid Layouts */
+        .movies, .webseries, .music, .books,
+        .category-results,
+        .watchlist-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        /* Media Item Cards */
+        .item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 15px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            width: 200px;
+        }
+
+        .item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.3);
+            border-color: rgba(102, 126, 234, 0.5);
+        }
+
+        .item:hover::before {
+            transform: scaleX(1);
+        }
+
+        .item img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+
+        .item h3,
+        .item span {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        /* Watchlist Button */
+        .watchlist-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            margin: 5px auto;
+        }
+
+        .watchlist-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .watchlist-btn.added {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        /* Detail Modal */
+        .detail-modal {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .detail-modal.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .detail-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .detail-dialog {
+            position: relative;
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 20px;
+            max-width: 720px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            z-index: 1;
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px); 
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0); 
+            }
+        }
+
+        .detail-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            font-size: 24px;
+            cursor: pointer;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .detail-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+
+        .detail-header {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .detail-poster {
+            width: 180px;
+            height: 270px;
+            object-fit: cover;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .detail-meta h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .detail-section {
+            margin-bottom: 20px;
+        }
+
+        .detail-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .detail-section p {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+        }
+
+        .detail-loading,
+        .detail-error {
+            text-align: center;
+            padding: 30px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .detail-error {
+            color: #ff6b6b;
+        }
+
+        /* Watchlist Specific Styles */
+        .watchlist-intro {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        .watchlist-section {
+            margin-bottom: 40px;
+        }
+
+        .watchlist-section h3 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .watchlist-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .watchlist-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.3);
+        }
+
+        .watchlist-card img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+
+        .watchlist-card span {
+            color: white;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .watchlist-remove {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .watchlist-remove:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        /* Status Messages */
+        .recommendation-status,
+        .empty-state,
+        .watchlist-empty {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            font-weight: 500;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .side-menu {
+                width: 70px;
+                padding: 20px 0;
+            }
+
+            .side-menu li {
+                padding: 15px 10px;
+                font-size: 12px;
+                text-align: center;
+            }
+
+            .content {
+                margin-left: 70px;
+                padding: 20px;
+            }
+
+            header {
+                padding: 0 15px;
+            }
+
+            header h1 {
+                font-size: 20px;
+            }
+
+            .movies, .webseries, .music, .books,
+            .category-results,
+            .watchlist-grid {
+                gap: 15px;
+            }
+
+            .item {
+                width: 150px;
+            }
+
+            .item img,
+            .watchlist-card img {
+                height: 220px;
+            }
+
+            .toggle-buttons {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .toggle-btn {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+
+            .detail-header {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .detail-poster {
+                width: 100%;
+                max-width: 250px;
+            }
+        }
+
+        /* Loading Animation */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        /* Section Spacing */
+        .recommendation-section,
+        .browse-section {
+            margin-top: 30px;
+        }
+
+        .category-recommendations,
+        .category-results {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <h1>MediaMate</h1>
+        <div class="user-info">
+            <span id="userName">Loading...</span>
+            <button id="logoutBtn" class="btn btn-danger btn-sm">Logout</button>
+        </div>
+    </header>
+
+    <!-- Main -->
+    <main>
+                <!-- Side Menu -->
+                <nav class="side-menu">
+                    <ul>
+                        <li onclick="loadSection('movies')" class="active">Movies</li>
+                        <li onclick="loadSection('webseries')">Webseries</li>
+                        <li onclick="loadSection('music')">Music</li>
+                        <li onclick="loadSection('books')">Books</li>
+                        <li onclick="loadSection('watchlist')">Watchlist</li>
+                    </ul>
+                </nav>
+        
+                <!-- Content -->
+                <section class="content" id="contentSection">
+                    <div class="search-bar">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Search here...">
+                        <button class="btn btn-primary mt-2" id="searchBtn" onclick="performSearch()">Search</button>
+                    </div>
+                    <h2>Welcome to MediaMate</h2>
+                    <p>Select a category from the side menu to get started!</p>
+                </section>
+            </main>
+
+            <div class="detail-modal" id="detailModal" hidden>
+                <div class="detail-backdrop" id="detailBackdrop"></div>
+                <div class="detail-dialog" role="dialog" aria-modal="true">
+                    <button class="detail-close" id="detailCloseBtn" aria-label="Close details">×</button>
+                    <div id="detailContent" class="detail-content">
+                        <div class="detail-loading">Loading...</div>
+                    </div>
+                </div>
+            </div>
+        
+            <!-- Firebase SDK -->
+            <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-app-compat.js"></script>
+            <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-auth-compat.js"></script>
+            <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-database-compat.js"></script>
+        
+            <!-- Recommendation Modules -->
+            <script src="recomandation system/Movie Recommedation/movie-recommender.js"></script>
+            <script src="recomandation system/Webseries Recommendation/webseries-recommender.js"></script>
+            <script src="recomandation system/Music Recomendation/music-recommender.js"></script>
+            <script src="recomandation system/Book Recomendation/book-recommender.js"></script>
+        
+            <script>
+                // Firebase Configuration
+                const firebaseConfig = {
+                    apiKey: "AIzaSyAmCKNLQa5D_VTTDApD5KRPGTxTvuMHZu4",
+                    authDomain: "mediamate-7be1d.firebaseapp.com",
+                    databaseURL: "https://mediamate-7be1d-default-rtdb.firebaseio.com",
+                    projectId: "mediamate-7be1d",
+                    storageBucket: "mediamate-7be1d.firebasestorage.app",
+                    messagingSenderId: "1070130926077",
+                    appId: "1:1070130926077:web:781de2dc1275d193af4994",
+                    measurementId: "G-BSV2LSNR6D"
+                };
+        
+                // Initialize Firebase
+                firebase.initializeApp(firebaseConfig);
+                const database = firebase.database();
+                const auth = firebase.auth();
+        
+                const userName = document.getElementById("userName");
+                const logoutBtn = document.getElementById("logoutBtn");
+
+                // Add click event to userName to go to profile page
+                userName.addEventListener('click', () => {
+                    window.location.href = 'profile.html';
+                });
+        
+                // Fetch User Data
+                auth.onAuthStateChanged((user) => {
+                    if (user) {
+                        const userId = user.uid;
+
+                        loadWatchlistCache(userId);
+        
+                        database.ref("users/" + userId).once("value")
+                            .then((snapshot) => {
+                                const data = snapshot.val() || {};
+                                userName.textContent = data.name || "User ";
+                                loadInitialRecommendations(data.favourites || {});
+                            })
+                            .catch((error) => {
+                                console.error('Error fetching user data:', error);
+                                alert("Error fetching user data: " + error.message);
+                                userName.textContent = "Error Loading User";
+                                recommendationStatus = 'error';
+                                recommendationCache = null;
+                                renderRecommendationsForSection(currentSection);
+                            });
+                    } else {
+                        clearWatchlistState();
+                        window.location.href = "login.html";
+                    }
+                });
+        
+                // Logout Functionality
+                logoutBtn.addEventListener("click", () => {
+                    auth.signOut().then(() => {
+                        clearWatchlistState();
+                        window.location.href = "login.html";
+                    }).catch((error) => {
+                        alert("Error logging out: " + error.message);
+                    });
+                });
+        
+                const performSearch = () => {
+                    const query = document.getElementById('searchInput').value.trim();
+                    if (!query) {
+                        alert("Please enter a search term.");
+                        return;
+                    }
+        
+                    const activeSection = document.querySelector('.side-menu ul li.active');
+                    if (!activeSection) {
+                        alert("Please select a section first.");
+                        return;
+                    }
+        
+                    const section = activeSection.textContent.toLowerCase();
+                    loadSection(section, query);
+                };
+
+                    const escapeHtmlText = (value = '') => value
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#39;');
+
+                    const sanitizePosterUrl = (poster) => (
+                        poster && poster !== 'N/A'
+                            ? poster
+                            : 'https://via.placeholder.com/200x300?text=No+Image'
+                    );
+
+                    const showContainerMessage = (containerId, message) => {
+                        const container = document.getElementById(containerId);
+                        if (container) {
+                            container.innerHTML = `<p class="empty-state">${escapeHtmlText(message)}</p>`;
+                        }
+                    };
+
+                    const encodeWatchlistPayload = (data) => encodeURIComponent(JSON.stringify({
+                        title: data.title || '',
+                        poster: data.poster || '',
+                        type: data.type || 'other',
+                        id: data.id || ''
+                    }));
+
+                    const decodeWatchlistPayload = (encoded = '') => {
+                        try {
+                            return JSON.parse(decodeURIComponent(encoded));
+                        } catch (error) {
+                            console.error('Failed to decode watchlist payload:', error);
+                            return null;
+                        }
+                    };
+
+                    let watchlistData = {};
+                    let watchlistLookup = new Map();
+
+                    const normalizeWatchlistType = (type = '') => {
+                        const normalized = (type || '').toString().toLowerCase();
+                        return ['movies', 'webseries', 'music', 'books'].includes(normalized) ? normalized : 'other';
+                    };
+
+                    const makeWatchlistKey = (title = '', type = 'other', sourceId = '') => {
+                        const normalizedType = normalizeWatchlistType(type);
+                        const idPart = (sourceId || '').toString().trim().toLowerCase();
+                        if (idPart) {
+                            return `${normalizedType}::id::${idPart}`;
+                        }
+                        return `${normalizedType}::name::${(title || '').toString().trim().toLowerCase()}`;
+                    };
+
+                    const updateWatchlistState = (watchlistObj = {}) => {
+                        watchlistData = watchlistObj || {};
+                        watchlistLookup = new Map();
+
+                        const categories = {
+                            movies: [],
+                            webseries: [],
+                            music: [],
+                            books: [],
+                            other: []
+                        };
+
+                        Object.entries(watchlistData).forEach(([id, entry]) => {
+                            if (!entry) {
+                                return;
+                            }
+
+                            const type = normalizeWatchlistType(entry.type);
+                            const name = (entry.name || entry.title || 'Untitled').toString();
+                            const sourceId = (entry.sourceId || entry.mediaId || '').toString();
+                            const normalizedKey = makeWatchlistKey(name, type, sourceId);
+                            const poster = sanitizePosterUrl(entry.poster);
+                            const record = { id, name, type, poster, sourceId };
+
+                            categories[type].push(record);
+                            watchlistLookup.set(normalizedKey, record);
+                        });
+
+                        return categories;
+                    };
+
+                    const markWatchlistButtonAdded = (button, firebaseId) => {
+                        if (!button) {
+                            return;
+                        }
+                        button.classList.add('added');
+                        button.textContent = '✓';
+                        button.title = 'Remove from Watchlist';
+                        button.setAttribute('aria-label', 'Remove from Watchlist');
+                        if (firebaseId) {
+                            button.dataset.watchlistId = firebaseId;
+                        }
+                    };
+
+                    const markWatchlistButtonDefault = (button) => {
+                        if (!button) {
+                            return;
+                        }
+                        button.classList.remove('added');
+                        button.textContent = '+';
+                        button.title = 'Add to Watchlist';
+                        button.setAttribute('aria-label', 'Add to Watchlist');
+                        delete button.dataset.watchlistId;
+                    };
+
+                    const syncWatchlistButtons = () => {
+                        document.querySelectorAll('.watchlist-btn').forEach((button) => {
+                            const title = button.dataset.title || '';
+                            const type = button.dataset.type || '';
+                            const sourceId = button.dataset.sourceId || '';
+                            const key = makeWatchlistKey(title, type, sourceId);
+                            const record = watchlistLookup.get(key);
+                            if (record && record.id) {
+                                markWatchlistButtonAdded(button, record.id);
+                                button.dataset.sourceId = record.sourceId || sourceId;
+                            } else {
+                                markWatchlistButtonDefault(button);
+                            }
+                        });
+                    };
+
+                    const loadWatchlistCache = (userId) => {
+                        if (!userId) {
+                            return;
+                        }
+                        database.ref(`/users/${userId}/watchlist`).once('value')
+                            .then((snapshot) => {
+                                updateWatchlistState(snapshot.val() || {});
+                                syncWatchlistButtons();
+                            })
+                            .catch((error) => {
+                                console.error('Failed to preload watchlist:', error);
+                            });
+                    };
+
+                    const clearWatchlistState = () => {
+                        updateWatchlistState({});
+                        syncWatchlistButtons();
+                    };
+
+                    const detailModal = document.getElementById('detailModal');
+                    const detailBackdrop = document.getElementById('detailBackdrop');
+                    const detailCloseBtn = document.getElementById('detailCloseBtn');
+                    const detailContent = document.getElementById('detailContent');
+
+                    const setDetailContent = (html) => {
+                        if (detailContent) {
+                            detailContent.innerHTML = html;
+                        }
+                    };
+
+                    const setDetailLoading = (message) => {
+                        setDetailContent(`<div class="detail-loading">${escapeHtmlText(message)}</div>`);
+                    };
+
+                    const openDetailModal = () => {
+                        if (!detailModal) {
+                            return;
+                        }
+                        detailModal.classList.add('active');
+                        detailModal.removeAttribute('hidden');
+                        document.body.style.overflow = 'hidden';
+                    };
+
+                    const closeDetailModal = () => {
+                        if (!detailModal) {
+                            return;
+                        }
+                        detailModal.classList.remove('active');
+                        detailModal.setAttribute('hidden', '');
+                        setDetailLoading('Loading...');
+                        document.body.style.overflow = '';
+                    };
+
+                    if (detailBackdrop) {
+                        detailBackdrop.addEventListener('click', closeDetailModal);
+                    }
+
+                    if (detailCloseBtn) {
+                        detailCloseBtn.addEventListener('click', closeDetailModal);
+                    }
+
+                    window.addEventListener('keydown', (event) => {
+                        if (event.key === 'Escape' && detailModal && !detailModal.hasAttribute('hidden')) {
+                            closeDetailModal();
+                        }
+                    });
+
+                    const GEMINI_API_KEY = 'AIzaSyBtGBG8qmwCafPDbLAD5aEtMeVyodeX22Y';
+                    const GEMINI_MODEL_OPTIONS = [
+                        { version: 'v1beta', name: 'gemini-2.5-flash' },
+                        { version: 'v1', name: 'gemini-2.5-flash' },
+                        { version: 'v1beta', name: 'gemini-2.5-flash' },
+                        { version: 'v1', name: 'gemini-2.5-flash' }
+                    ];
+
+                    let recommendationCache = null;
+                    let recommendationLoading = false;
+                    let recommendationStatus = 'idle';
+                    let currentSection = 'movies';
+
+                    const normalizeFavouritesForRecommendations = (favourites = {}) => {
+                        const movies = Array.isArray(favourites.movies) ? favourites.movies : [];
+                        const series = Array.isArray(favourites.series) ? favourites.series : [];
+                        const webseries = Array.isArray(favourites.webseries) ? favourites.webseries : series;
+                        const music = Array.isArray(favourites.music) ? favourites.music : [];
+                        const books = Array.isArray(favourites.books) ? favourites.books : [];
+
+                        return {
+                            movies: [...new Set(movies.map(item => item.trim()).filter(Boolean))],
+                            webseries: [...new Set(webseries.map(item => item.trim()).filter(Boolean))],
+                            music: [...new Set(music.map(item => item.trim()).filter(Boolean))],
+                            books: [...new Set(books.map(item => item.trim()).filter(Boolean))]
+                        };
+                    };
+
+                    const favouritesAreEmpty = (favourites) => (
+                        !favourites || Object.values(favourites).every(list => !list || list.length === 0)
+                    );
+
+                    const buildRecommendationPrompt = (favourites) => {
+                        const payload = JSON.stringify(favourites, null, 2);
+                        return `You are a recommendation engine for movies, web series, music albums, and books. Given the user's favourites below, respond with a JSON object containing four keys: "movies", "webseries", "music", and "books". Each key must map to an array of 5 new, diverse recommendations the user might like. Do not repeat any of the favourites provided. Prioritize globally available, popular, or critically acclaimed titles released in the last 25 years when possible. Return only valid JSON without additional commentary.\n\nUser favourites:\n${payload}`;
+                    };
+
+                    const parseGeminiJson = (text) => {
+                        if (!text) {
+                            throw new Error('Empty response from Gemini.');
+                        }
+
+                        const cleaned = text
+                            .replace(/```json/gi, '')
+                            .replace(/```/g, '')
+                            .trim();
+
+                        try {
+                            const parsed = JSON.parse(cleaned);
+                            return {
+                                movies: Array.isArray(parsed.movies) ? parsed.movies : [],
+                                webseries: Array.isArray(parsed.webseries) ? parsed.webseries : [],
+                                music: Array.isArray(parsed.music) ? parsed.music : [],
+                                books: Array.isArray(parsed.books) ? parsed.books : []
+                            };
+                        } catch (error) {
+                            console.error('Failed to parse Gemini JSON:', error, cleaned);
+                            throw new Error('Gemini returned an unexpected format.');
+                        }
+                    };
+
+                    const requestGeminiModel = async ({ version, name }, prompt) => {
+                        const payload = {
+                            contents: [
+                                {
+                                    role: 'user',
+                                    parts: [
+                                        { text: prompt }
+                                    ]
+                                }
+                            ]
+                        };
+
+                        if (version === 'v1beta') {
+                            payload.generationConfig = {
+                                responseMimeType: 'application/json'
+                            };
+                        }
+
+                        const response = await fetch(`https://generativelanguage.googleapis.com/${version}/models/${name}:generateContent?key=${GEMINI_API_KEY}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(payload)
+                        });
+
+                        if (!response.ok) {
+                            const errorBody = await response.text();
+                            const error = new Error(`Gemini API error (${response.status}) [${version}/${name}]: ${errorBody}`);
+                            error.statusCode = response.status;
+                            error.model = name;
+                            error.apiVersion = version;
+                            throw error;
+                        }
+
+                        const data = await response.json();
+                        const textResponse = data?.candidates?.[0]?.content?.parts
+                            ?.map(part => part.text)
+                            .join(' ');
+
+                        return parseGeminiJson(textResponse);
+                    };
+
+                    const fetchGeminiRecommendations = async (favourites) => {
+                        const prompt = buildRecommendationPrompt(favourites);
+                        let lastError = null;
+
+                        for (const option of GEMINI_MODEL_OPTIONS) {
+                            try {
+                                return await requestGeminiModel(option, prompt);
+                            } catch (error) {
+                                lastError = error;
+                                if (error?.statusCode !== 404) {
+                                    throw error;
+                                }
+                            }
+                        }
+
+                        throw lastError || new Error('Gemini API is unavailable.');
+                    };
+
+                    const dedupeAndTrimList = (items, limit = 5) => {
+                        return [...new Set((items || []).map(item => item && item.toString().trim()).filter(Boolean))].slice(0, limit);
+                    };
+
+                    const fetchOmdbDetails = async (title, type) => {
+                        try {
+                            const params = new URLSearchParams({ apikey: '6c6fb997', plot: 'short', t: title });
+                            if (type) {
+                                params.set('type', type);
+                            }
+
+                            const response = await fetch(`https://www.omdbapi.com/?${params.toString()}`);
+                            const data = await response.json();
+                            if (data.Response !== 'True') {
+                                console.warn(`OMDB: Movie not found - ${title}`);
+                                return null;
+                            }
+
+                            return {
+                                Title: data.Title,
+                                Poster: data.Poster !== 'N/A' ? data.Poster : `https://placehold.co/300x450/1a1a2e/ffffff?text=${encodeURIComponent(data.Title)}`,
+                                Year: data.Year,
+                                Plot: data.Plot,
+                                id: data.imdbID,
+                                imdbID: data.imdbID,
+                                Type: data.Type
+                            };
+                        } catch (error) {
+                            console.error(`Error fetching OMDB details for "${title}":`, error);
+                            return null;
+                        }
+                    };
+
+                    const fetchSpotifyAlbumByName = async (name, token) => {
+                        if (!token) {
+                            return null;
+                        }
+
+                        const response = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(name)}&type=album&limit=1`, {
+                            headers: {
+                                Authorization: `Bearer ${token}`
+                            }
+                        });
+                        const data = await response.json();
+                        const album = data?.albums?.items?.[0];
+                        if (!album) {
+                            return null;
+                        }
+
+                        return {
+                            Title: album.name,
+                            Poster: album.images?.[0]?.url || '',
+                            id: album.id,
+                            albumId: album.id,
+                            artists: (album.artists || []).map(artist => artist.name)
+                        };
+                    };
+
+                    const fetchSpotifyTrackByName = async (artist, song, token) => {
+                        if (!token) {
+                            return null;
+                        }
+
+                        try {
+                            // Search for the specific track with artist and song name
+                            const searchQuery = `track:${song} artist:${artist}`;
+                            const response = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(searchQuery)}&type=track&limit=1`, {
+                                headers: {
+                                    Authorization: `Bearer ${token}`
+                                }
+                            });
+                            const data = await response.json();
+                            const track = data?.tracks?.items?.[0];
+                            
+                            if (!track) {
+                                console.warn(`Track not found on Spotify: ${artist} - ${song}`);
+                                return null;
+                            }
+
+                            return {
+                                Title: `${track.artists[0].name} - ${track.name}`,
+                                Artist: track.artists[0].name,
+                                Song: track.name,
+                                Poster: track.album.images?.[0]?.url || `https://placehold.co/300x450/1a1a2e/ffffff?text=${encodeURIComponent(artist)}`,
+                                Year: track.album.release_date?.split('-')[0] || 'N/A',
+                                Type: 'music',
+                                Plot: `${track.album.name} - ${track.artists.map(a => a.name).join(', ')}`,
+                                id: track.id,
+                                spotifyUrl: track.external_urls?.spotify || '',
+                                albumId: track.album.id
+                            };
+                        } catch (error) {
+                            console.error(`Error fetching track from Spotify: ${artist} - ${song}`, error);
+                            return null;
+                        }
+                    };
+
+                    const fetchBookByTitle = async (name) => {
+                        try {
+                            const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(name)}&maxResults=1`);
+                            const data = await response.json();
+                            const volume = data?.items?.[0];
+                            if (!volume) {
+                                console.warn(`Book not found on Google Books: ${name}`);
+                                return null;
+                            }
+
+                            const info = volume.volumeInfo;
+                            return {
+                                Title: info?.title || name,
+                                Poster: info?.imageLinks?.thumbnail?.replace('http://', 'https://') || info?.imageLinks?.smallThumbnail?.replace('http://', 'https://') || `https://placehold.co/300x450/1a1a2e/ffffff?text=${encodeURIComponent(name)}`,
+                                Year: info?.publishedDate?.split('-')[0] || 'N/A',
+                                Type: 'book',
+                                Plot: info?.description || 'No description available',
+                                Author: info?.authors?.join(', ') || 'Unknown',
+                                id: volume.id,
+                                volumeId: volume.id,
+                                previewLink: info?.previewLink || ''
+                            };
+                        } catch (error) {
+                            console.error(`Error fetching book from Google Books: ${name}`, error);
+                            return null;
+                        }
+                    };
+
+                    const fetchRecommendationDetailsForCategory = async (category, names) => {
+                        const cleanedNames = dedupeAndTrimList(names, 6);
+                        if (!cleanedNames.length) {
+                            return [];
+                        }
+
+                        if (category === 'movies' || category === 'webseries') {
+                            const type = category === 'movies' ? 'movie' : 'series';
+                            const results = await Promise.all(cleanedNames.map(name => fetchOmdbDetails(name, type)));
+                            return results.filter(Boolean);
+                        }
+
+                        if (category === 'music') {
+                            const token = await getSpotifyToken();
+                            const results = await Promise.all(cleanedNames.map(name => fetchSpotifyAlbumByName(name, token)));
+                            return results.filter(Boolean);
+                        }
+
+                        if (category === 'books') {
+                            const results = await Promise.all(cleanedNames.map(name => fetchBookByTitle(name)));
+                            return results.filter(Boolean);
+                        }
+
+                        return [];
+                    };
+
+                    const fetchRecommendationDetails = async (recommendations) => {
+                        const categories = ['movies', 'webseries', 'music', 'books'];
+                        const detailEntries = await Promise.all(
+                            categories.map(async (category) => {
+                                const details = await fetchRecommendationDetailsForCategory(category, recommendations[category]);
+                                return [category, details];
+                            })
+                        );
+
+                        return Object.fromEntries(detailEntries);
+                    };
+
+                    const renderRecommendationsForSection = (section) => {
+                        const container = document.getElementById(`${section}-recommendations`);
+                        if (!container) {
+                            return;
+                        }
+
+                        const categoryKey = ({
+                            movies: 'movies',
+                            webseries: 'webseries',
+                            music: 'music',
+                            books: 'books'
+                        })[section] || section;
+                        container.innerHTML = '';
+                        const headingHtml = '<h3>Recommended for You</h3>';
+
+                        if (recommendationStatus === 'loading') {
+                            container.innerHTML = `${headingHtml}<p class="recommendation-status">Finding recommendations for you...</p>`;
+                            return;
+                        }
+
+                        if (recommendationStatus === 'empty') {
+                            container.innerHTML = `${headingHtml}<p class="recommendation-status">Add some favourites to see personalized picks.</p>`;
+                            return;
+                        }
+
+                        if (recommendationStatus === 'error') {
+                            container.innerHTML = `${headingHtml}<p class="recommendation-status">Recommendations are unavailable right now.</p>`;
+                            return;
+                        }
+
+                        if (recommendationStatus === 'idle') {
+                            container.innerHTML = `${headingHtml}<p class="recommendation-status">Personalized picks will appear here once we learn your favourites.</p>`;
+                            return;
+                        }
+
+                        if (!recommendationCache || !recommendationCache[categoryKey]?.length) {
+                            if (recommendationStatus === 'ready') {
+                                container.innerHTML = `${headingHtml}<p class="recommendation-status">No personalized picks yet—try updating your favourites.</p>`;
+                            }
+                            return;
+                        }
+
+                        displayItems(recommendationCache[categoryKey], categoryKey, {
+                            containerId: `${section}-recommendations`,
+                            heading: 'Recommended for You',
+                            replace: true
+                        });
+                    };
+
+                    const loadInitialRecommendations = async (favourites) => {
+                        const normalized = normalizeFavouritesForRecommendations(favourites);
+
+                        if (favouritesAreEmpty(normalized)) {
+                            recommendationCache = null;
+                            recommendationStatus = 'empty';
+                            renderRecommendationsForSection(currentSection);
+                            return;
+                        }
+
+                        if (recommendationCache) {
+                            recommendationStatus = 'ready';
+                            renderRecommendationsForSection(currentSection);
+                            return;
+                        }
+
+                        if (recommendationLoading) {
+                            recommendationStatus = 'loading';
+                            renderRecommendationsForSection(currentSection);
+                            return;
+                        }
+
+                        recommendationLoading = true;
+                        recommendationStatus = 'loading';
+                        renderRecommendationsForSection(currentSection);
+
+                        try {
+                            // Initialize recommendation cache with empty arrays
+                            recommendationCache = {
+                                movies: [],
+                                webseries: [],
+                                music: [],
+                                books: []
+                            };
+                            
+                            // Load all recommendation models
+                            console.log('Loading recommendation models...');
+                            await Promise.all([
+                                movieRecommender.loadData(),
+                                webseriesRecommender.loadData(),
+                                musicRecommender.loadData(),
+                                bookRecommender.loadData()
+                            ]);
+                            
+                            // Get movie recommendations using the model
+                            const movieTitles = normalized.movies || [];
+                            
+                            if (movieTitles.length > 0) {
+                                try {
+                                    // Get recommendations from the model (returns movie titles and IDs)
+                                    const modelRecommendations = movieRecommender.getRecommendationsWithDetails(movieTitles, 9);
+                                    console.log('Model-based movie recommendations:', modelRecommendations);
+                                    
+                                    // Fetch OMDB details for each recommended movie
+                                    const omdbPromises = modelRecommendations.map(async (movie) => {
+                                        const omdbData = await fetchOmdbDetails(movie.Title, 'movie');
+                                        
+                                        if (omdbData) {
+                                            // Use OMDB data with recommendation score
+                                            return {
+                                                ...omdbData,
+                                                recommendationScore: movie.score
+                                            };
+                                        } else {
+                                            // Fallback to basic info if OMDB fails
+                                            return {
+                                                Title: movie.Title,
+                                                Poster: `https://placehold.co/300x450/1a1a2e/ffffff?text=${encodeURIComponent(movie.Title)}`,
+                                                Year: 'N/A',
+                                                Type: 'movie',
+                                                Plot: 'Recommended based on your favorites',
+                                                imdbID: movie.imdbID || movie.id,
+                                                recommendationScore: movie.score
+                                            };
+                                        }
+                                    });
+                                    
+                                    // Wait for all OMDB fetches to complete
+                                    recommendationCache.movies = await Promise.all(omdbPromises);
+                                    console.log('Movie recommendations with OMDB data:', recommendationCache.movies.length, 'movies');
+                                } catch (movieError) {
+                                    console.error('Error getting movie recommendations:', movieError);
+                                }
+                            }
+                            
+                            // Get webseries recommendations using the model
+                            const webseriesTitles = normalized.webseries || [];
+                            
+                            if (webseriesTitles.length > 0) {
+                                try {
+                                    const webseriesRecommendations = webseriesRecommender.getRecommendationsWithDetails(webseriesTitles, 9);
+                                    console.log('Model-based webseries recommendations:', webseriesRecommendations);
+                                    
+                                    // Fetch OMDB details for each recommended show
+                                    const omdbPromises = webseriesRecommendations.map(async (show) => {
+                                        const omdbData = await fetchOmdbDetails(show.Title, 'series');
+                                        
+                                        if (omdbData) {
+                                            return {
+                                                ...omdbData,
+                                                recommendationScore: show.score
+                                            };
+                                        } else {
+                                            return {
+                                                Title: show.Title,
+                                                Poster: `https://placehold.co/300x450/1a1a2e/ffffff?text=${encodeURIComponent(show.Title)}`,
+                                                Year: 'N/A',
+                                                Type: 'series',
+                                                Plot: 'Recommended based on your favorites',
+                                                imdbID: show.imdbID || show.id,
+                                                recommendationScore: show.score
+                                            };
+                                        }
+                                    });
+                                    
+                                    recommendationCache.webseries = await Promise.all(omdbPromises);
+                                    console.log('Webseries recommendations with OMDB data:', recommendationCache.webseries.length, 'shows');
+                                } catch (webseriesError) {
+                                    console.error('Error getting webseries recommendations:', webseriesError);
+                                }
+                            }
+                            
+                            // Get music recommendations using the model
+                            const musicTitles = normalized.music || [];
+                            
+                            if (musicTitles.length > 0) {
+                                try {
+                                    const musicRecommendations = musicRecommender.getRecommendationsWithDetails(musicTitles, 9);
+                                    console.log('Model-based music recommendations:', musicRecommendations);
+                                    
+                                    // Fetch Spotify details for each recommended track
+                                    const spotifyToken = await getSpotifyToken();
+                                    const spotifyPromises = musicRecommendations.map(async (song) => {
+                                        const spotifyData = await fetchSpotifyTrackByName(song.Artist, song.Song, spotifyToken);
+                                        
+                                        if (spotifyData) {
+                                            // Use Spotify data with recommendation score
+                                            return {
+                                                ...spotifyData,
+                                                recommendationScore: song.score
+                                            };
+                                        } else {
+                                            // Fallback to basic info if Spotify fails
+                                            return {
+                                                Title: song.Title,
+                                                Artist: song.Artist,
+                                                Song: song.Song,
+                                                Poster: `https://placehold.co/300x450/1a1a2e/ffffff?text=${encodeURIComponent(song.Artist)}`,
+                                                Year: 'N/A',
+                                                Type: 'music',
+                                                Plot: 'Recommended based on your favorites',
+                                                recommendationScore: song.score
+                                            };
+                                        }
+                                    });
+                                    
+                                    recommendationCache.music = await Promise.all(spotifyPromises);
+                                    console.log('Music recommendations with Spotify data:', recommendationCache.music.length, 'songs');
+                                } catch (musicError) {
+                                    console.error('Error getting music recommendations:', musicError);
+                                }
+                            }
+                            
+                            // Get book recommendations using the model
+                            const bookTitles = normalized.books || [];
+                            
+                            if (bookTitles.length > 0) {
+                                try {
+                                    const bookRecommendations = bookRecommender.getRecommendationsWithDetails(bookTitles, 9);
+                                    console.log('Model-based book recommendations:', bookRecommendations);
+                                    
+                                    // Fetch Google Books details for each recommended book
+                                    const googleBooksPromises = bookRecommendations.map(async (book) => {
+                                        const googleBooksData = await fetchBookByTitle(book.Title);
+                                        
+                                        if (googleBooksData) {
+                                            // Use Google Books data with recommendation score
+                                            return {
+                                                ...googleBooksData,
+                                                recommendationScore: book.score
+                                            };
+                                        } else {
+                                            // Fallback to basic info if Google Books fails
+                                            return {
+                                                Title: book.Title,
+                                                Poster: `https://placehold.co/300x450/1a1a2e/ffffff?text=${encodeURIComponent(book.Title)}`,
+                                                Year: 'N/A',
+                                                Type: 'book',
+                                                Plot: 'Recommended based on your favorites',
+                                                Author: 'Unknown',
+                                                recommendationScore: book.score
+                                            };
+                                        }
+                                    });
+                                    
+                                    recommendationCache.books = await Promise.all(googleBooksPromises);
+                                    console.log('Book recommendations with Google Books data:', recommendationCache.books.length, 'books');
+                                } catch (bookError) {
+                                    console.error('Error getting book recommendations:', bookError);
+                                }
+                            }
+                            
+                            recommendationStatus = 'ready';
+                        } catch (error) {
+                            console.error('Failed to load recommendations:', error);
+                            // Even on error, try to keep partial results
+                            if (!recommendationCache || Object.keys(recommendationCache).length === 0) {
+                                recommendationCache = {
+                                    movies: [],
+                                    webseries: [],
+                                    music: [],
+                                    books: []
+                                };
+                            }
+                            recommendationStatus = 'error';
+                        } finally {
+                            recommendationLoading = false;
+                            renderRecommendationsForSection(currentSection);
+                        }
+                    };
+        
+                // Load Section Content
+                const loadSection = (section, query = '') => {
+                    const content = document.getElementById('contentSection');
+                    if (!content) {
+                        return;
+                    }
+
+                    currentSection = section;
+
+                    document.querySelectorAll('.side-menu ul li').forEach((li) => {
+                        const matches = li.textContent.trim().toLowerCase() === section;
+                        li.classList.toggle('active', matches);
+                    });
+
+                    if (section === 'watchlist') {
+                        content.innerHTML = `
+                            <h2>Watchlist</h2>
+                            <p class="watchlist-intro">Your saved picks are grouped below.</p>
+                            <div class="watchlist-wrapper" id="watchlistWrapper">
+                                <p class="watchlist-empty">Loading your watchlist...</p>
+                            </div>
+                        `;
+                        displayWatchlist();
+                        return;
+                    }
+
+                    const sectionTitle = section.charAt(0).toUpperCase() + section.slice(1);
+                    const searchPlaceholder = `Search ${sectionTitle}...`;
+                    const recommendationsId = `${section}-recommendations`;
+                    const resultsId = `${section}-results`;
+                    const resultsPlaceholder = query
+                        ? '<p class="empty-state">Searching for matches...</p>'
+                        : '<p class="empty-state">Loading fresh picks...</p>';
+
+                    content.innerHTML = `
+                        <div class="search-bar">
+                            <input type="text" id="searchInput" class="form-control" placeholder="${escapeHtmlText(searchPlaceholder)}">
+                            <button class="btn btn-primary mt-2" id="searchBtn" onclick="performSearch()">Search</button>
+                        </div>
+                        <h2>${escapeHtmlText(sectionTitle)}</h2>
+                        <div class="toggle-buttons">
+                            <button class="toggle-btn active" onclick="toggleView('${section}', 'popular')">Popular</button>
+                            <button class="toggle-btn" onclick="toggleView('${section}', 'recommendations')">Recommendations</button>
+                        </div>
+                        <section class="recommendation-section" id="${section}-recommendation-section" style="display: none;">
+                            <div id="${recommendationsId}" class="category-recommendations"></div>
+                        </section>
+                        <section class="browse-section" id="${section}-browse-section">
+                            <div id="${resultsId}" class="category-results">${resultsPlaceholder}</div>
+                        </section>
+                    `;
+
+                    renderRecommendationsForSection(section);
+
+                    switch (section) {
+                        case 'movies':
+                            fetchMovies(query);
+                            break;
+                        case 'webseries':
+                            fetchWebseries(query);
+                            break;
+                        case 'music':
+                            fetchMusic(query);
+                            break;
+                        case 'books':
+                            fetchBooks(query);
+                            break;
+                        default:
+                            break;
+                    }
+                };
+
+        // Toggle between Popular and Recommendations view
+        const toggleView = (section, view) => {
+            const recommendationSection = document.getElementById(`${section}-recommendation-section`);
+            const browseSection = document.getElementById(`${section}-browse-section`);
+            const buttons = document.querySelectorAll('.toggle-btn');
+
+            // Update button active states
+            buttons.forEach(btn => {
+                const buttonText = btn.textContent.toLowerCase();
+                if (buttonText === view) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Toggle sections
+            if (view === 'recommendations') {
+                recommendationSection.style.display = 'block';
+                browseSection.style.display = 'none';
+            } else {
+                recommendationSection.style.display = 'none';
+                browseSection.style.display = 'block';
+            }
+        };
+
+        // Popular search terms for infinite scrolling
+        const popularMovieTerms = ['action', 'comedy', 'drama', 'thriller', 'romance', 'horror', 'adventure', 'fantasy', 'sci-fi', 'animation'];
+        const popularSeriesTerms = ['drama', 'comedy', 'action', 'thriller', 'mystery', 'crime', 'fantasy', 'adventure', 'horror', 'sci-fi'];
+        const popularMusicGenres = ['pop', 'rock', 'hip-hop', 'electronic', 'jazz', 'classical', 'country', 'r&b', 'indie', 'metal'];
+        const popularBookGenres = ['fiction', 'mystery', 'romance', 'thriller', 'fantasy', 'science fiction', 'biography', 'history', 'self-help', 'business'];
+
+        let currentMovieIndex = 0;
+        let currentSeriesIndex = 0;
+        let currentMusicIndex = 0;
+        let currentBookIndex = 0;
+
+        const fetchMovies = async (query = '') => {
+            if (query) {
+                // Search mode
+                const url = `https://www.omdbapi.com/?apikey=6c6fb997&s=${query}&type=movie`;
+                fetch(url)
+                    .then(res => res.json())
+                    .then(data => displayItems(data.Search || [], 'movies', {
+                        containerId: 'movies-results',
+                        replace: true,
+                        heading: 'Search Results',
+                        emptyMessage: 'No movies matched your search.'
+                    }))
+                    .catch(err => {
+                        console.error("Error fetching movies:", err);
+                        showContainerMessage('movies-results', 'Unable to load movies right now.');
+                    });
+            } else {
+                // Popular mode - fetch multiple terms
+                const promises = popularMovieTerms.map(term => 
+                    fetch(`https://www.omdbapi.com/?apikey=6c6fb997&s=${term}&type=movie`)
+                        .then(res => res.json())
+                        .then(data => data.Search || [])
+                        .catch(() => [])
+                );
+
+                Promise.all(promises)
+                    .then(results => {
+                        const allMovies = results.flat();
+                        // Remove duplicates based on imdbID
+                        const uniqueMovies = Array.from(new Map(allMovies.map(m => [m.imdbID, m])).values());
+                        
+                        displayItems(uniqueMovies, 'movies', {
+                            containerId: 'movies-results',
+                            replace: true,
+                            heading: 'Popular Movies',
+                            emptyMessage: 'No movies to show right now.'
+                        });
+                    })
+                    .catch(err => {
+                        console.error("Error fetching movies:", err);
+                        showContainerMessage('movies-results', 'Unable to load movies right now.');
+                    });
+            }
+        };
+
+        const fetchWebseries = async (query = '') => {
+            if (query) {
+                // Search mode
+                const url = `https://www.omdbapi.com/?apikey=6c6fb997&s=${query}&type=series`;
+                fetch(url)
+                    .then(res => res.json())
+                    .then(data => displayItems(data.Search || [], 'webseries', {
+                        containerId: 'webseries-results',
+                        replace: true,
+                        heading: 'Search Results',
+                        emptyMessage: 'No web series matched your search.'
+                    }))
+                    .catch(err => {
+                        console.error("Error fetching webseries:", err);
+                        showContainerMessage('webseries-results', 'Unable to load web series right now.');
+                    });
+            } else {
+                // Popular mode - fetch multiple terms
+                const promises = popularSeriesTerms.map(term => 
+                    fetch(`https://www.omdbapi.com/?apikey=6c6fb997&s=${term}&type=series`)
+                        .then(res => res.json())
+                        .then(data => data.Search || [])
+                        .catch(() => [])
+                );
+
+                Promise.all(promises)
+                    .then(results => {
+                        const allSeries = results.flat();
+                        // Remove duplicates based on imdbID
+                        const uniqueSeries = Array.from(new Map(allSeries.map(s => [s.imdbID, s])).values());
+                        
+                        displayItems(uniqueSeries, 'webseries', {
+                            containerId: 'webseries-results',
+                            replace: true,
+                            heading: 'Popular Web Series',
+                            emptyMessage: 'No web series to show right now.'
+                        });
+                    })
+                    .catch(err => {
+                        console.error("Error fetching webseries:", err);
+                        showContainerMessage('webseries-results', 'Unable to load web series right now.');
+                    });
+            }
+        };
+
+        const fetchMusic = async (query = '') => {
+            try {
+                const token = await getSpotifyToken();
+                
+                if (query) {
+                    // Search mode
+                    const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=album&limit=50`;
+                    fetch(url, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        const albumItems = data.albums?.items || [];
+                        const items = albumItems.map(album => ({
+                            Title: album.name,
+                            Poster: album.images?.[0]?.url || '',
+                            id: album.id || '',
+                            artists: (album.artists || []).map(artist => artist.name),
+                            releaseDate: album.release_date || '',
+                            totalTracks: album.total_tracks || 0,
+                            spotifyUrl: album.external_urls?.spotify || ''
+                        }));
+
+                        displayItems(items, 'music', {
+                            containerId: 'music-results',
+                            replace: true,
+                            heading: 'Search Results',
+                            emptyMessage: 'No albums matched your search.'
+                        });
+                    })
+                    .catch(err => {
+                        console.error("Error fetching music:", err);
+                        showContainerMessage('music-results', 'Unable to load music right now.');
+                    });
+                } else {
+                    // Popular mode - fetch from multiple genres
+                    const promises = popularMusicGenres.map(genre => 
+                        fetch(`https://api.spotify.com/v1/search?q=genre:${genre}&type=album&limit=20`, {
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        })
+                        .then(res => res.json())
+                        .then(data => data.albums?.items || [])
+                        .catch(() => [])
+                    );
+
+                    Promise.all(promises)
+                        .then(results => {
+                            const allAlbums = results.flat();
+                            // Remove duplicates based on id
+                            const uniqueAlbums = Array.from(new Map(allAlbums.map(a => [a.id, a])).values());
+                            
+                            const items = uniqueAlbums.map(album => ({
+                                Title: album.name,
+                                Poster: album.images?.[0]?.url || '',
+                                id: album.id || '',
+                                artists: (album.artists || []).map(artist => artist.name),
+                                releaseDate: album.release_date || '',
+                                totalTracks: album.total_tracks || 0,
+                                spotifyUrl: album.external_urls?.spotify || ''
+                            }));
+
+                            displayItems(items, 'music', {
+                                containerId: 'music-results',
+                                replace: true,
+                                heading: 'Popular Music',
+                                emptyMessage: 'No music to show right now.'
+                            });
+                        })
+                        .catch(err => {
+                            console.error("Error fetching music:", err);
+                            showContainerMessage('music-results', 'Unable to load music right now.');
+                        });
+                }
+            } catch (err) {
+                console.error("Error with Spotify token:", err);
+                showContainerMessage('music-results', 'Unable to load music right now.');
+            }
+        };
+
+        const fetchBooks = async (query = '') => {
+            if (query) {
+                // Search mode
+                const url = `https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=40`;
+                fetch(url)
+                    .then(res => res.json())
+                    .then(data => {
+                        const volumes = Array.isArray(data.items) ? data.items : [];
+                        const items = volumes.map(book => ({
+                            Title: book.volumeInfo?.title || 'Untitled',
+                            Poster: book.volumeInfo?.imageLinks?.thumbnail || "",
+                            id: book.id || '',
+                            authors: book.volumeInfo?.authors || [],
+                            publisher: book.volumeInfo?.publisher || '',
+                            publishedDate: book.volumeInfo?.publishedDate || '',
+                            description: book.volumeInfo?.description || ''
+                        }));
+                        displayItems(items, 'books', {
+                            containerId: 'books-results',
+                            replace: true,
+                            heading: 'Search Results',
+                            emptyMessage: 'No books matched your search.'
+                        });
+                    })
+                    .catch(err => {
+                        console.error("Error fetching books:", err);
+                        showContainerMessage('books-results', 'Unable to load books right now.');
+                    });
+            } else {
+                // Popular mode - fetch from multiple genres
+                const promises = popularBookGenres.map(genre => 
+                    fetch(`https://www.googleapis.com/books/v1/volumes?q=subject:${encodeURIComponent(genre)}&maxResults=20`)
+                        .then(res => res.json())
+                        .then(data => data.items || [])
+                        .catch(() => [])
+                );
+
+                Promise.all(promises)
+                    .then(results => {
+                        const allBooks = results.flat();
+                        // Remove duplicates based on id
+                        const uniqueBooks = Array.from(new Map(allBooks.map(b => [b.id, b])).values());
+                        
+                        const items = uniqueBooks.map(book => ({
+                            Title: book.volumeInfo?.title || 'Untitled',
+                            Poster: book.volumeInfo?.imageLinks?.thumbnail || "",
+                            id: book.id || '',
+                            authors: book.volumeInfo?.authors || [],
+                            publisher: book.volumeInfo?.publisher || '',
+                            publishedDate: book.volumeInfo?.publishedDate || '',
+                            description: book.volumeInfo?.description || ''
+                        }));
+                        
+                        displayItems(items, 'books', {
+                            containerId: 'books-results',
+                            replace: true,
+                            heading: 'Popular Books',
+                            emptyMessage: 'No books to show right now.'
+                        });
+                    })
+                    .catch(err => {
+                        console.error("Error fetching books:", err);
+                        showContainerMessage('books-results', 'Unable to load books right now.');
+                    });
+            }
+        };
+
+        const displayItems = (items, type, options = {}) => {
+            const normalizedType = normalizeWatchlistType(type);
+            const {
+                containerId = null,
+                heading = '',
+                replace = false,
+                wrapperClass = '',
+                emptyMessage = ''
+            } = options;
+
+            const target = containerId
+                ? document.getElementById(containerId)
+                : document.getElementById('contentSection');
+
+            if (!target) {
+                return;
+            }
+
+            const validItems = Array.isArray(items) ? items : [];
+            if (!validItems.length) {
+                if (replace && emptyMessage) {
+                    target.innerHTML = `<p class="empty-state">${escapeHtmlText(emptyMessage)}</p>`;
+                }
+                return;
+            }
+
+            const cardsHtml = validItems.map((item) => {
+                const title = (item.Title || 'Untitled').toString();
+                const poster = sanitizePosterUrl(item.Poster);
+                const sourceId = (item.id || item.imdbID || item.volumeId || item.albumId || '').toString();
+                const safeTitle = escapeHtmlText(title);
+                const safePoster = escapeHtmlText(poster);
+                const safeSourceId = escapeHtmlText(sourceId);
+                const key = makeWatchlistKey(title, normalizedType, sourceId);
+                const record = watchlistLookup.get(key);
+                const isSaved = !!(record && record.id);
+                const buttonClass = `watchlist-btn${isSaved ? ' added' : ''}`;
+                const buttonSymbol = isSaved ? '✓' : '+';
+                const buttonLabel = isSaved ? 'Remove from Watchlist' : 'Add to Watchlist';
+                const watchlistIdAttr = isSaved ? ` data-watchlist-id="${escapeHtmlText(record.id)}"` : '';
+                const payload = encodeWatchlistPayload({ title, poster, type: normalizedType, id: sourceId });
+
+                return `
+                        <div class="item" data-title="${safeTitle}" data-type="${normalizedType}" data-source-id="${safeSourceId}" data-poster="${safePoster}" onclick="handleCardClick(this)">
+                            <img src="${safePoster}" alt="${safeTitle}">
+                            <h4>${safeTitle}</h4>
+                            <button class="${buttonClass}"
+                                data-title="${safeTitle}"
+                                data-type="${normalizedType}"
+                                data-source-id="${safeSourceId}"
+                                onclick="event.stopPropagation(); toggleWatchlistItem(this, '${payload}')"
+                                title="${buttonLabel}"
+                                aria-label="${buttonLabel}"${watchlistIdAttr}>${buttonSymbol}</button>
+                        </div>
+                `;
+            }).join('');
+
+            if (!cardsHtml) {
+                if (replace && emptyMessage) {
+                    target.innerHTML = `<p class="empty-state">${escapeHtmlText(emptyMessage)}</p>`;
+                }
+                return;
+            }
+
+            const blockHtml = `
+                ${heading ? `<h3>${escapeHtmlText(heading)}</h3>` : ''}
+                <div class="${wrapperClass || normalizedType}">
+                    ${cardsHtml}
+                </div>
+            `;
+
+            if (replace) {
+                target.innerHTML = blockHtml;
+            } else {
+                target.innerHTML += blockHtml;
+            }
+
+            syncWatchlistButtons();
+        };
+
+        const displayWatchlist = () => {
+            const wrapper = document.getElementById('watchlistWrapper');
+            const user = auth.currentUser;
+
+            if (!wrapper) {
+                return;
+            }
+
+            if (!user) {
+                wrapper.innerHTML = '<p class="watchlist-empty">Please login to view your watchlist.</p>';
+                return;
+            }
+
+            wrapper.innerHTML = '<p class="watchlist-empty">Loading your watchlist...</p>';
+
+            database.ref(`/users/${user.uid}/watchlist`).once('value')
+                .then(snapshot => {
+                    const categories = updateWatchlistState(snapshot.val() || {});
+
+                    const labels = {
+                        movies: 'Movies',
+                        webseries: 'Web Series',
+                        music: 'Music',
+                        books: 'Books',
+                        other: 'Other Picks'
+                    };
+
+                    const sections = Object.entries(categories)
+                        .filter(([, items]) => items.length)
+                        .map(([key, items]) => `
+                            <div class="watchlist-section">
+                                <h3>${labels[key]}</h3>
+                                <div class="watchlist-grid">
+                                    ${items.map(item => `
+                                        <div class="watchlist-card" data-title="${escapeHtmlText(item.name)}" data-type="${escapeHtmlText(item.type)}" data-source-id="${escapeHtmlText(item.sourceId || '')}" data-poster="${escapeHtmlText(item.poster)}" onclick="handleWatchlistCardClick(this)">
+                                            <img src="${escapeHtmlText(item.poster)}" alt="${escapeHtmlText(item.name)}">
+                                            <span>${escapeHtmlText(item.name)}</span>
+                                            <button class="watchlist-remove" onclick="event.stopPropagation(); removeFromWatchlist('${escapeHtmlText(item.id)}', true)">Remove</button>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `)
+                        .join('');
+
+                    wrapper.innerHTML = sections || '<p class="watchlist-empty">Your watchlist is empty!</p>';
+                    syncWatchlistButtons();
+                })
+                .catch(error => {
+                    console.error('Error loading watchlist:', error);
+                    wrapper.innerHTML = '<p class="watchlist-empty">Unable to load your watchlist right now.</p>';
+                    syncWatchlistButtons();
+                });
+        };
+
+        const formatDuration = (ms) => {
+            if (!ms && ms !== 0) {
+                return '';
+            }
+            const totalSeconds = Math.floor(Number(ms) / 1000);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = Math.max(0, totalSeconds % 60);
+            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        };
+
+        const renderMetaRows = (rows) => rows
+            .filter(row => row && row.value && row.value !== 'N/A')
+            .map(row => `<p><strong>${escapeHtmlText(row.label)}:</strong> ${escapeHtmlText(row.value)}</p>`)
+            .join('');
+
+        const showItemDetails = async ({ type, sourceId, title, poster }) => {
+            if (!detailModal) {
+                return;
+            }
+
+            const normalizedType = normalizeWatchlistType(type);
+            const displayTitle = title || 'Details';
+            const coverImage = sanitizePosterUrl(poster);
+
+            openDetailModal();
+            setDetailLoading(`Loading ${displayTitle}...`);
+
+            try {
+                let detailHtml = '';
+
+                if (normalizedType === 'movies' || normalizedType === 'webseries') {
+                    const params = new URLSearchParams({ apikey: '6c6fb997', plot: 'full' });
+                    if (sourceId) {
+                        params.set('i', sourceId);
+                    } else if (title) {
+                        params.set('t', title);
+                        if (normalizedType === 'movies') {
+                            params.set('type', 'movie');
+                        } else if (normalizedType === 'webseries') {
+                            params.set('type', 'series');
+                        }
+                    }
+
+                    const response = await fetch(`https://www.omdbapi.com/?${params.toString()}`);
+                    const data = await response.json();
+
+                    if (data.Response !== 'True') {
+                        throw new Error(data.Error || 'Unable to load movie details.');
+                    }
+
+                    const posterUrl = sanitizePosterUrl(data.Poster || coverImage);
+                    const metaHtml = renderMetaRows([
+                        { label: 'Year', value: data.Year },
+                        { label: 'Rated', value: data.Rated },
+                        { label: 'Runtime', value: data.Runtime },
+                        { label: 'Genre', value: data.Genre },
+                        { label: 'Director', value: data.Director },
+                        { label: 'Writer', value: data.Writer },
+                        { label: 'Actors', value: data.Actors },
+                        { label: 'IMDb Rating', value: data.imdbRating },
+                        { label: 'Box Office', value: data.BoxOffice }
+                    ]) || '<p>Additional details unavailable.</p>';
+                    const plotText = data.Plot && data.Plot !== 'N/A' ? data.Plot : 'No plot summary available.';
+
+                    detailHtml = `
+                        <div class="detail-header">
+                            <img class="detail-poster" src="${escapeHtmlText(posterUrl)}" alt="${escapeHtmlText(data.Title || displayTitle)}">
+                            <div class="detail-meta">
+                                <h2>${escapeHtmlText(data.Title || displayTitle)}</h2>
+                                ${metaHtml}
+                            </div>
+                        </div>
+                        <div class="detail-section">
+                            <h3>Plot</h3>
+                            <p>${escapeHtmlText(plotText)}</p>
+                        </div>
+                    `;
+
+                    if (Array.isArray(data.Ratings) && data.Ratings.length) {
+                        detailHtml += `
+                            <div class="detail-section">
+                                <h3>Ratings</h3>
+                                <ul class="detail-list">
+                                    ${data.Ratings.map(rating => `<li>${escapeHtmlText(`${rating.Source}: ${rating.Value}`)}</li>`).join('')}
+                                </ul>
+                            </div>
+                        `;
+                    }
+                } else if (normalizedType === 'books') {
+                    if (!sourceId && !title) {
+                        setDetailContent(`
+                            <div class="detail-header">
+                                <img class="detail-poster" src="${escapeHtmlText(coverImage)}" alt="${escapeHtmlText(displayTitle)}">
+                                <div class="detail-meta">
+                                    <h2>${escapeHtmlText(displayTitle)}</h2>
+                                    <p>No additional information available.</p>
+                                </div>
+                            </div>
+                        `);
+                        return;
+                    }
+
+                    let volumeData = null;
+                    if (sourceId) {
+                        const response = await fetch(`https://www.googleapis.com/books/v1/volumes/${sourceId}`);
+                        if (!response.ok) {
+                            throw new Error('Unable to load book details.');
+                        }
+                        volumeData = await response.json();
+                    }
+
+                    const info = volumeData?.volumeInfo || {};
+                    const posterUrl = sanitizePosterUrl(info.imageLinks?.thumbnail || coverImage);
+                    const authors = (info.authors || []).join(', ');
+                    const categories = (info.categories || []).join(', ');
+                    const published = [info.publisher, info.publishedDate].filter(Boolean).join(' • ');
+                    const pageCount = info.pageCount ? `${info.pageCount} pages` : '';
+                    const description = info.description || 'Description not available.';
+                    const previewLink = info.previewLink
+                        ? `<p><a href="${escapeHtmlText(info.previewLink)}" target="_blank" rel="noopener noreferrer">Preview on Google Books</a></p>`
+                        : '';
+
+                    detailHtml = `
+                        <div class="detail-header">
+                            <img class="detail-poster" src="${escapeHtmlText(posterUrl)}" alt="${escapeHtmlText(info.title || displayTitle)}">
+                            <div class="detail-meta">
+                                <h2>${escapeHtmlText(info.title || displayTitle)}</h2>
+                                ${authors ? `<p><strong>Author(s):</strong> ${escapeHtmlText(authors)}</p>` : ''}
+                                ${published ? `<p><strong>Published:</strong> ${escapeHtmlText(published)}</p>` : ''}
+                                ${pageCount ? `<p><strong>Length:</strong> ${escapeHtmlText(pageCount)}</p>` : ''}
+                                ${categories ? `<p><strong>Genres:</strong> ${escapeHtmlText(categories)}</p>` : ''}
+                            </div>
+                        </div>
+                        <div class="detail-section">
+                            <h3>Description</h3>
+                            <p>${escapeHtmlText(description)}</p>
+                        </div>
+                        ${previewLink}
+                    `;
+                } else if (normalizedType === 'music') {
+                    if (!sourceId) {
+                        setDetailContent(`
+                            <div class="detail-header">
+                                <img class="detail-poster" src="${escapeHtmlText(coverImage)}" alt="${escapeHtmlText(displayTitle)}">
+                                <div class="detail-meta">
+                                    <h2>${escapeHtmlText(displayTitle)}</h2>
+                                    <p>No additional information available.</p>
+                                </div>
+                            </div>
+                        `);
+                        return;
+                    }
+
+                    const token = await getSpotifyToken();
+                    const response = await fetch(`https://api.spotify.com/v1/albums/${sourceId}`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    });
+                    const album = await response.json();
+                    if (album.error) {
+                        throw new Error(album.error.message || 'Unable to load album details.');
+                    }
+
+                    const posterUrl = sanitizePosterUrl(album.images?.[0]?.url || coverImage);
+                    const artists = (album.artists || []).map(artist => artist.name).join(', ');
+                    const releaseDate = album.release_date || '';
+                    const totalTracks = album.total_tracks || 0;
+                    const spotifyLink = album.external_urls?.spotify
+                        ? `<p><a href="${escapeHtmlText(album.external_urls.spotify)}" target="_blank" rel="noopener noreferrer">Open in Spotify</a></p>`
+                        : '';
+                    const tracks = Array.isArray(album.tracks?.items) ? album.tracks.items : [];
+                    const trackList = tracks.length
+                        ? `<ol class="detail-list">${tracks.map(track => `<li>${escapeHtmlText(track.name)}${track.duration_ms ? ` – ${escapeHtmlText(formatDuration(track.duration_ms))}` : ''}</li>`).join('')}</ol>`
+                        : '<p>No track list available.</p>';
+
+                    detailHtml = `
+                        <div class="detail-header">
+                            <img class="detail-poster" src="${escapeHtmlText(posterUrl)}" alt="${escapeHtmlText(album.name || displayTitle)}">
+                            <div class="detail-meta">
+                                <h2>${escapeHtmlText(album.name || displayTitle)}</h2>
+                                ${artists ? `<p><strong>Artist(s):</strong> ${escapeHtmlText(artists)}</p>` : ''}
+                                ${releaseDate ? `<p><strong>Release Date:</strong> ${escapeHtmlText(releaseDate)}</p>` : ''}
+                                ${totalTracks ? `<p><strong>Total Tracks:</strong> ${escapeHtmlText(totalTracks)}</p>` : ''}
+                                ${spotifyLink}
+                            </div>
+                        </div>
+                        <div class="detail-section">
+                            <h3>Track List</h3>
+                            ${trackList}
+                        </div>
+                    `;
+                } else {
+                    detailHtml = `
+                        <div class="detail-header">
+                            <img class="detail-poster" src="${escapeHtmlText(coverImage)}" alt="${escapeHtmlText(displayTitle)}">
+                            <div class="detail-meta">
+                                <h2>${escapeHtmlText(displayTitle)}</h2>
+                                <p>No additional information available.</p>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                setDetailContent(detailHtml);
+            } catch (error) {
+                console.error('Error loading item details:', error);
+                setDetailContent('<div class="detail-error">Unable to load details right now. Please try again later.</div>');
+            }
+        };
+
+        const handleCardClick = (element) => {
+            if (!element) {
+                return;
+            }
+
+            showItemDetails({
+                type: element.dataset.type || '',
+                sourceId: element.dataset.sourceId || '',
+                title: element.dataset.title || '',
+                poster: element.dataset.poster || ''
+            });
+        };
+
+        const handleWatchlistCardClick = (element) => {
+            if (!element) {
+                return;
+            }
+
+            showItemDetails({
+                type: element.dataset.type || '',
+                sourceId: element.dataset.sourceId || '',
+                title: element.dataset.title || '',
+                poster: element.dataset.poster || ''
+            });
+        };
+
+        const removeFromWatchlist = async (firebaseId, refreshView = false) => {
+            const user = auth.currentUser;
+            if (!firebaseId || !user) {
+                return false;
+            }
+
+            try {
+                await database.ref(`/users/${user.uid}/watchlist/${firebaseId}`).remove();
+                if (watchlistData && watchlistData[firebaseId]) {
+                    delete watchlistData[firebaseId];
+                }
+
+                updateWatchlistState(watchlistData);
+
+                if (refreshView) {
+                    displayWatchlist();
+                }
+
+                syncWatchlistButtons();
+                return true;
+            } catch (error) {
+                console.error('Error removing from watchlist:', error);
+                alert('Error removing from watchlist. Please try again.');
+                return false;
+            }
+        };
+
+        const toggleWatchlistItem = async (button, encodedItem) => {
+            if (!button) {
+                return;
+            }
+
+            const itemData = decodeWatchlistPayload(encodedItem);
+            if (!itemData || !itemData.title) {
+                console.error('Invalid watchlist payload.');
+                return;
+            }
+
+            const normalizedType = normalizeWatchlistType(itemData.type);
+            const existingId = button.dataset.watchlistId;
+
+            if (existingId) {
+                const removed = await removeFromWatchlist(existingId, document.getElementById('watchlistWrapper') !== null);
+                if (removed) {
+                    markWatchlistButtonDefault(button);
+                }
+                return;
+            }
+
+            const user = auth.currentUser;
+            if (!user) {
+                alert('Please login to add items to your watchlist.');
+                return;
+            }
+
+            const payload = {
+                name: itemData.title,
+                type: normalizedType,
+                poster: sanitizePosterUrl(itemData.poster),
+                sourceId: (itemData.id || '').toString()
+            };
+
+            try {
+                const ref = await database.ref(`/users/${user.uid}/watchlist`).push(payload);
+                const firebaseId = ref.key;
+                watchlistData[firebaseId] = payload;
+                updateWatchlistState(watchlistData);
+
+                markWatchlistButtonAdded(button, firebaseId);
+                syncWatchlistButtons();
+
+                if (document.getElementById('watchlistWrapper')) {
+                    displayWatchlist();
+                }
+            } catch (error) {
+                console.error('Error adding to watchlist:', error);
+                alert('Error adding to watchlist. Please try again.');
+            }
+        };
+
+    window.handleCardClick = handleCardClick;
+    window.handleWatchlistCardClick = handleWatchlistCardClick;
+    window.removeFromWatchlist = removeFromWatchlist;
+    window.toggleWatchlistItem = toggleWatchlistItem;
+    window.loadSection = loadSection;
+    window.performSearch = performSearch;
+
+        const getSpotifyToken = async () => {
+            const response = await fetch('https://accounts.spotify.com/api/token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': `Basic ${btoa('4acfb5c3c58448a3a6fc909910dc0282:f7fbb11f27954ab08687ff32dfdbecfb')}`
+                },
+                body: 'grant_type=client_credentials'
+            });
+            const data = await response.json();
+            return data.access_token;
+        };
+
+        // Add event listeners to side menu items
+        document.querySelectorAll('.side-menu ul li').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.side-menu ul li').forEach(li => li.classList.remove('active'));
+                item.classList.add('active');
+            });
+        });
+
+        // Load default section on startup
+        window.onload = () => {
+            loadSection('movies');
+        };
+    </script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MediaMate</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "@google/generative-ai": "https://esm.run/@google/generative-ai"
+      }
+    }
+  </script>
+  <style>
+    /* Chatbot Widget Styles */
+    .media-mate-widget {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 300px;
+      max-width: 90%;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      overflow: hidden;
+      display: none;
+      flex-direction: column;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      z-index: 1000;
+    }
+
+    .media-mate-header {
+      background-color: #007bff;
+      color: white;
+      padding: 10px;
+      font-size: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .media-mate-header button {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+        .media-mate-content {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+    .media-mate-content input {
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+
+    .media-mate-content button {
+      padding: 8px 12px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+        .media-mate-output-area {
+            display: flex;
+            align-items: stretch;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .media-mate-output-wrapper {
+            flex: 1;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            max-height: 240px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .media-mate-gallery {
+            margin-top: 12px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 10px;
+        }
+
+        .media-mate-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 6px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+        }
+
+        .media-mate-card img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 4px;
+        }
+
+        .media-mate-card span {
+            font-size: 12px;
+            font-weight: 600;
+            color: #333;
+        }
+
+            .media-mate-scroll-buttons {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            .media-mate-scroll-buttons button {
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                border: 1px solid #007bff;
+                background-color: #fff;
+                color: #007bff;
+                cursor: pointer;
+                font-size: 16px;
+                transition: background-color 0.2s, color 0.2s;
+            }
+
+            .media-mate-scroll-buttons button:hover {
+                background-color: #007bff;
+                color: #fff;
+            }
+
+    .media-mate-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 20px;
+      cursor: pointer;
+      z-index: 999;
+    }
+  </style>
+</head>
+<body>
+  <!-- Chatbot Toggle Button -->
+  <button class="media-mate-toggle" id="botToggle">💬</button>
+
+  <!-- Chatbot Widget -->
+  <div class="media-mate-widget" id="mediaMate">
+    <div class="media-mate-header">
+      <span>MediaMate</span>
+      <button onclick="toggleBot()">×</button>
+    </div>
+    <div class="media-mate-content">
+      <input type="text" id="questionInput" placeholder="Enter your question...">
+      <button id="generateButton">Generate</button>
+            <div class="media-mate-output-area">
+                <div class="media-mate-output-wrapper" id="outputWrapper">
+                    <div class="media-mate-gallery" id="outputGallery"></div>
+                </div>
+                <div class="media-mate-scroll-buttons">
+                    <button id="scrollUpBtn" aria-label="Scroll up">▲</button>
+                    <button id="scrollDownBtn" aria-label="Scroll down">▼</button>
+                </div>
+            </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { GoogleGenerativeAI } from "@google/generative-ai";
+
+    const API_KEY = "AIzaSyBtGBG8qmwCafPDbLAD5aEtMeVyodeX22Y";
+
+    const genAI = new GoogleGenerativeAI(API_KEY);
+
+    // Function to toggle the chatbot widget
+    function toggleBot() {
+      const bot = document.getElementById("mediaMate");
+      const toggleButton = document.getElementById("botToggle");
+      if (bot.style.display === "none" || !bot.style.display) {
+        bot.style.display = "flex";
+        toggleButton.style.display = "none";
+      } else {
+        bot.style.display = "none";
+        toggleButton.style.display = "block";
+      }
+    }
+
+        const escapeHtml = (value) => value
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+
+            const extractMovieTitles = (rawText) => {
+                const lines = rawText
+                    .split(/\r?\n/)
+                    .map((line) => line.trim())
+                    .filter(Boolean);
+
+                const candidates = [];
+                const seen = new Set();
+                const bulletPattern = /^([\-\*\u2022\d]+[.)]?\s+)/;
+
+                lines.forEach((line) => {
+                    const bulletMatch = line.match(bulletPattern);
+                    if (!bulletMatch) {
+                        return;
+                    }
+
+                    const withoutPrefix = line.slice(bulletMatch[0].length).trim();
+                    if (!withoutPrefix) {
+                        return;
+                    }
+
+                    const truncated = withoutPrefix.split(/[–—\-:]/)[0].trim();
+                    const cleaned = truncated.replace(/["“”\u2022]/g, "").trim();
+
+                    if (!cleaned) {
+                        return;
+                    }
+
+                    const titlePattern = /^[A-Za-z0-9][A-Za-z0-9'&.,:() ]{1,80}$/;
+                    const normalized = cleaned.toLowerCase();
+
+                    if (titlePattern.test(cleaned) && !seen.has(normalized)) {
+                        seen.add(normalized);
+                        candidates.push(cleaned);
+                    }
+                });
+
+                return candidates;
+            };
+
+        const parseTitleYear = (rawTitle) => {
+            const match = rawTitle.match(/^(.*?)(?:\s*\((\d{4})\))?$/);
+            return {
+                name: match ? match[1].trim() : rawTitle.trim(),
+                year: match && match[2] ? match[2] : ""
+            };
+        };
+
+        const fetchPosterForTitle = async (title) => {
+            const { name, year } = parseTitleYear(title);
+
+            if (!name) {
+                return null;
+            }
+
+            const params = new URLSearchParams({ apikey: "6c6fb997", t: name });
+            if (year) {
+                params.append("y", year);
+            }
+
+            try {
+                const response = await fetch(`https://www.omdbapi.com/?${params.toString()}`);
+                const data = await response.json();
+
+                if (data.Response === "True" && data.Poster && data.Poster !== "N/A") {
+                    return {
+                        title: data.Title || name,
+                        poster: data.Poster
+                    };
+                }
+            } catch (error) {
+                console.error("Poster fetch failed for", title, error);
+            }
+
+            return null;
+        };
+
+        const renderMovieGallery = async (titles, fallbackMessage = "") => {
+            const galleryEl = document.getElementById("outputGallery");
+
+            if (!galleryEl) {
+                return;
+            }
+
+            if (!titles.length) {
+                galleryEl.innerHTML = fallbackMessage
+                    ? `<span>${escapeHtml(fallbackMessage)}</span>`
+                    : "";
+                return;
+            }
+
+            galleryEl.innerHTML = "<span>Loading posters...</span>";
+
+            try {
+                const posters = await Promise.all(titles.map(fetchPosterForTitle));
+                const valid = posters.filter(Boolean);
+
+                if (valid.length) {
+                    galleryEl.innerHTML = valid.map((movie) => `
+                        <div class="media-mate-card">
+                            <img src="${movie.poster}" alt="${escapeHtml(movie.title)}">
+                            <span>${escapeHtml(movie.title)}</span>
+                        </div>
+                    `).join("");
+                } else {
+                    galleryEl.innerHTML = "<span>No posters found.</span>";
+                }
+            } catch (error) {
+                console.error("Failed to render posters:", error);
+                galleryEl.innerHTML = "<span>Unable to load posters.</span>";
+            }
+        };
+
+        async function run() {
+            const question = document.getElementById("questionInput").value.trim();
+
+            if (!question) {
+                alert("Please enter a question.");
+                return;
+            }
+
+                    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+                    const finalQuestion = `${question}\n\nReply with a bulleted list of movie titles only. Include the release year in parentheses when known. Do not add descriptions, categories, or extra sentences.`;
+
+            try {
+                        const result = await model.generateContent(finalQuestion);
+                const response = await result.response;
+                const text = await response.text();
+                const recommendations = extractMovieTitles(text);
+                const outputWrapper = document.getElementById("outputWrapper");
+
+                if (recommendations.length) {
+                    renderMovieGallery(recommendations.slice(0, 10));
+                } else {
+                    renderMovieGallery([], "No movie recommendations detected.");
+                }
+
+                if (outputWrapper) {
+                    outputWrapper.scrollTop = 0;
+                }
+            } catch (error) {
+                console.error("Error generating content:", error);
+                renderMovieGallery([], "Error generating content. Please try again later.");
+            }
+        }
+
+    document.getElementById("generateButton").addEventListener("click", run);
+
+    const scrollOutput = (direction) => {
+        const wrapper = document.getElementById("outputWrapper");
+        if (!wrapper) {
+            return;
+        }
+
+        const amount = direction === "down" ? 160 : -160;
+        wrapper.scrollBy({ top: amount, behavior: "smooth" });
+    };
+
+    document.getElementById("scrollUpBtn").addEventListener("click", () => scrollOutput("up"));
+    document.getElementById("scrollDownBtn").addEventListener("click", () => scrollOutput("down"));
+
+    // Add event listener for the toggle button
+    document.getElementById("botToggle").addEventListener("click", toggleBot);
+  </script>
+
+  <!-- Anime.js for animations -->
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+  <script>
+    // Page entrance animations
+    anime({
+      targets: 'header',
+      translateY: [-50, 0],
+      opacity: [0, 1],
+      duration: 800,
+      easing: 'easeOutExpo'
+    });
+
+    anime({
+      targets: '.side-menu li',
+      translateX: [-50, 0],
+      opacity: [0, 1],
+      duration: 600,
+      delay: anime.stagger(100, {start: 200}),
+      easing: 'easeOutExpo'
+    });
+
+    anime({
+      targets: '.search-bar',
+      translateY: [30, 0],
+      opacity: [0, 1],
+      duration: 600,
+      delay: 400,
+      easing: 'easeOutExpo'
+    });
+
+    // Animate items when they appear
+    function animateItems() {
+      const items = document.querySelectorAll('.item:not(.animated)');
+      if (items.length > 0) {
+        items.forEach(item => item.classList.add('animated'));
+        anime({
+          targets: items,
+          scale: [0.9, 1],
+          opacity: [0, 1],
+          duration: 500,
+          delay: anime.stagger(50),
+          easing: 'easeOutExpo'
+        });
+      }
+    }
+
+    // Observe content changes and animate new items
+    const contentObserver = new MutationObserver(() => {
+      setTimeout(animateItems, 100);
+    });
+
+    const contentSection = document.getElementById('contentSection');
+    if (contentSection) {
+      contentObserver.observe(contentSection, {
+        childList: true,
+        subtree: true
+      });
+    }
+
+    // Initial animation
+    setTimeout(animateItems, 600);
+  </script>
+</body>
+</html>

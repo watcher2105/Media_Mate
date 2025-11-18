@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediaMate - Select Favourites</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 40px 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Floating background elements */
+        .bg-circle {
+            position: fixed;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .bg-circle:nth-child(1) {
+            width: 400px;
+            height: 400px;
+            top: -200px;
+            right: -200px;
+            animation: float 25s infinite ease-in-out;
+        }
+
+        .bg-circle:nth-child(2) {
+            width: 300px;
+            height: 300px;
+            bottom: -150px;
+            left: -150px;
+            animation: float 20s infinite ease-in-out reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(120deg); }
+            66% { transform: translate(-20px, 20px) rotate(240deg); }
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .logo-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        h2 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 400;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .section:hover {
+            border-color: rgba(102, 126, 234, 0.4);
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.15);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        h4 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+        }
+
+        .progress-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .progress-badge.complete {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(102, 126, 234, 0.6);
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+        }
+
+        input[type="text"]::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .list-group {
+            list-style: none;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .list-group::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .list-group::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .list-group::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+        }
+
+        .list-group-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            padding: 15px 20px 15px 50px;
+            margin-bottom: 10px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .list-group-item::before {
+            content: "○";
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .list-group-item::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .list-group-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(102, 126, 234, 0.4);
+            transform: translateX(5px);
+        }
+
+        .list-group-item:hover::after {
+            transform: scaleY(1);
+        }
+
+        .list-group-item.selected {
+            background: rgba(102, 126, 234, 0.15);
+            border-color: rgba(102, 126, 234, 0.5);
+            font-weight: 600;
+        }
+
+        .list-group-item.selected::before {
+            content: "✓";
+            color: #38ef7d;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .list-group-item.selected::after {
+            transform: scaleY(1);
+        }
+
+        .selected-items {
+            margin-top: 15px;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95rem;
+            min-height: 52px;
+        }
+
+        .selected-items strong {
+            color: white;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 18px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-primary:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .btn-primary:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-primary span {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Back link */
+        .back-link {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 50px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(102, 126, 234, 0.5);
+            transform: translateX(-5px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 15px;
+            }
+
+            h2 {
+                font-size: 2rem;
+            }
+
+            .logo-icon {
+                font-size: 50px;
+            }
+
+            h4 {
+                font-size: 1.3rem;
+            }
+
+            .section {
+                padding: 20px;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .back-link {
+                top: 15px;
+                left: 15px;
+                padding: 10px 18px;
+                font-size: 0.9rem;
+            }
+
+            .list-group {
+                max-height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-circle"></div>
+    <div class="bg-circle"></div>
+
+    <a href="login.html" class="back-link">← Back to Login</a>
+
+    <a href="login.html" class="back-link">← Back to Login</a>
+
+    <div class="container">
+        <div class="header">
+            <div class="logo-icon">🎬</div>
+            <h2>Select Your Favourites</h2>
+            <p class="subtitle">Choose exactly 3 items from each category to get personalized recommendations</p>
+        </div>
+
+        <div>
+            <!-- Movies Section -->
+            <div class="section">
+                <div class="section-header">
+                    <h4>🎬 Movies</h4>
+                    <div class="progress-badge" id="movieProgress">0/3 Selected</div>
+                </div>
+                <div class="search-box">
+                    <input type="text" id="movieSearch" placeholder="🔍 Search for movies...">
+                </div>
+                <ul id="movieList" class="list-group"></ul>
+                <div id="selectedMovies" class="selected-items">
+                    <strong>Selected:</strong> None yet
+                </div>
+            </div>
+
+            <!-- Web Series Section -->
+            <div class="section">
+                <div class="section-header">
+                    <h4>📺 Web Series</h4>
+                    <div class="progress-badge" id="seriesProgress">0/3 Selected</div>
+                </div>
+                <div class="search-box">
+                    <input type="text" id="seriesSearch" placeholder="🔍 Search for web series...">
+                </div>
+                <ul id="seriesList" class="list-group"></ul>
+                <div id="selectedSeries" class="selected-items">
+                    <strong>Selected:</strong> None yet
+                </div>
+            </div>
+
+            <!-- Music Section -->
+            <div class="section">
+                <div class="section-header">
+                    <h4>🎵 Music</h4>
+                    <div class="progress-badge" id="musicProgress">0/3 Selected</div>
+                </div>
+                <div class="search-box">
+                    <input type="text" id="musicSearch" placeholder="🔍 Search for music...">
+                </div>
+                <ul id="musicList" class="list-group"></ul>
+                <div id="selectedMusic" class="selected-items">
+                    <strong>Selected:</strong> None yet
+                </div>
+            </div>
+
+            <!-- Books Section -->
+            <div class="section">
+                <div class="section-header">
+                    <h4>📚 Books</h4>
+                    <div class="progress-badge" id="bookProgress">0/3 Selected</div>
+                </div>
+                <div class="search-box">
+                    <input type="text" id="bookSearch" placeholder="🔍 Search for books...">
+                </div>
+                <ul id="bookList" class="list-group"></ul>
+                <div id="selectedBooks" class="selected-items">
+                    <strong>Selected:</strong> None yet
+                </div>
+            </div>
+
+            <!-- Save Button -->
+            <button id="saveBtn" class="btn-primary" disabled>
+                <span>Save and Continue to Dashboard</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+
+    <script>
+        // Entrance animations
+        anime({
+            targets: '.header',
+            translateY: [-30, 0],
+            opacity: [0, 1],
+            duration: 800,
+            easing: 'easeOutExpo'
+        });
+
+        anime({
+            targets: '.section',
+            translateY: [30, 0],
+            opacity: [0, 1],
+            duration: 600,
+            delay: anime.stagger(150, {start: 200}),
+            easing: 'easeOutExpo'
+        });
+
+        anime({
+            targets: '.logo-icon',
+            scale: [0.5, 1],
+            rotate: [0, 360],
+            duration: 1000,
+            easing: 'easeOutElastic(1, .6)'
+        });
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAmCKNLQa5D_VTTDApD5KRPGTxTvuMHZu4",
+            authDomain: "mediamate-7be1d.firebaseapp.com",
+            databaseURL: "https://mediamate-7be1d-default-rtdb.firebaseio.com",
+            projectId: "mediamate-7be1d",
+            storageBucket: "mediamate-7be1d.firebasestorage.app",
+            messagingSenderId: "1070130926077",
+            appId: "1:1070130926077:web:781de2dc1275d193af4994",
+            measurementId: "G-BSV2LSNR6D"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const auth = firebase.auth();
+
+        let userId;
+        let favourites = {
+            movies: [],
+            series: [],
+            music: [],
+            books: []
+        };
+
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                userId = user.uid;
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+
+        const updateSaveButton = () => {
+            const allSelected = Object.values(favourites).every((list) => list.length === 3);
+            document.getElementById("saveBtn").disabled = !allSelected;
+        };
+
+        const updateProgressBadge = (type) => {
+            const count = favourites[type].length;
+            const badge = document.getElementById(`${type}Progress`);
+            badge.textContent = `${count}/3 Selected`;
+            
+            if (count === 3) {
+                badge.classList.add('complete');
+                anime({
+                    targets: badge,
+                    scale: [1, 1.1, 1],
+                    duration: 400,
+                    easing: 'easeInOutQuad'
+                });
+            } else {
+                badge.classList.remove('complete');
+            }
+        };
+
+        const displaySelectedItems = (type) => {
+            const selectedDiv = document.getElementById(`selected${type.charAt(0).toUpperCase() + type.slice(1)}`);
+            const count = favourites[type].length;
+            const itemsList = favourites[type].join(", ");
+            
+            if (count === 0) {
+                selectedDiv.innerHTML = '<strong>Selected:</strong> None yet';
+            } else {
+                selectedDiv.innerHTML = `<strong>Selected:</strong> ${itemsList}`;
+            }
+            
+            updateProgressBadge(type);
+        };
+
+        const setupSection = (inputId, listId, type, fetchFunction) => {
+            const searchInput = document.getElementById(inputId);
+            const list = document.getElementById(listId);
+
+            searchInput.addEventListener("input", () => {
+                const query = searchInput.value.trim();
+                if (!query) return;
+
+                fetchFunction(query).then(results => {
+                    list.innerHTML = "";
+                    
+                    if (results.length === 0) {
+                        list.innerHTML = '<li style="padding: 20px; text-align: center; color: rgba(255,255,255,0.5);">No results found</li>';
+                        return;
+                    }
+                    
+                    results.slice(0, 5).forEach((item, index) => {
+                        const li = document.createElement("li");
+                        li.className = "list-group-item";
+                        li.textContent = item.name;
+                        li.style.opacity = '0';
+
+                        // Check if already selected
+                        if (favourites[type].includes(item.name)) {
+                            li.classList.add("selected");
+                        }
+
+                        li.addEventListener("click", () => {
+                            if (favourites[type].includes(item.name)) {
+                                // Deselect
+                                favourites[type] = favourites[type].filter(name => name !== item.name);
+                                li.classList.remove("selected");
+                                
+                                anime({
+                                    targets: li,
+                                    scale: [1.05, 1],
+                                    duration: 300,
+                                    easing: 'easeOutQuad'
+                                });
+                            } else if (favourites[type].length < 3) {
+                                // Select
+                                favourites[type].push(item.name);
+                                li.classList.add("selected");
+                                
+                                anime({
+                                    targets: li,
+                                    scale: [1, 1.05, 1],
+                                    duration: 400,
+                                    easing: 'easeOutElastic(1, .5)'
+                                });
+                            } else {
+                                // Already have 3 items
+                                anime({
+                                    targets: li.parentElement,
+                                    translateX: [0, -10, 10, -10, 10, 0],
+                                    duration: 500,
+                                    easing: 'easeInOutQuad'
+                                });
+                            }
+                            updateSaveButton();
+                            displaySelectedItems(type);
+                        });
+
+                        list.appendChild(li);
+                        
+                        // Animate item entrance
+                        anime({
+                            targets: li,
+                            opacity: [0, 1],
+                            translateY: [20, 0],
+                            duration: 400,
+                            delay: index * 50,
+                            easing: 'easeOutExpo'
+                        });
+                    });
+                });
+            });
+        };
+
+        async function fetchOMDBData(query, type) {
+            const apiKey = "6c6fb997";
+            const url = `https://www.omdbapi.com/?s=${encodeURIComponent(query)}&type=${type}&apikey=${apiKey}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            return data.Search ? data.Search.map(movie => ({ name: movie.Title })) : [];
+        }
+
+        async function getSpotifyAccessToken() {
+            const clientId = '4acfb5c3c58448a3a6fc909910dc0282';
+            const clientSecret = 'f7fbb11f27954ab08687ff32dfdbecfb';
+
+            const response = await fetch('https://accounts.spotify.com/api/token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': 'Basic ' + btoa(clientId + ':' + clientSecret)
+                },
+                body: 'grant_type=client_credentials'
+            });
+            const data = await response.json();
+            return data.access_token;
+        }
+
+        async function fetchSpotifyData(query) {
+            const token = await getSpotifyAccessToken();
+            const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=5`;
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const data = await response.json();
+            return data.tracks ? data.tracks.items.map(track => ({ name: track.name })) : [];
+        }
+
+        async function fetchGoogleBooksData(query) {
+            const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            return data.items ? data.items.map(book => ({ name: book.volumeInfo.title })) : [];
+        }
+
+        setupSection("movieSearch", "movieList", "movies", (query) => fetchOMDBData(query, 'movie'));
+        setupSection("seriesSearch", "seriesList", "series", (query) => fetchOMDBData(query, 'series'));
+        setupSection("musicSearch", "musicList", "music", fetchSpotifyData);
+        setupSection("bookSearch", "bookList", "books", fetchGoogleBooksData);
+
+        document.getElementById("saveBtn").addEventListener("click", () => {
+            if (!userId) return;
+
+            const btn = document.getElementById("saveBtn");
+            const btnText = btn.querySelector('span');
+            btn.disabled = true;
+            btnText.textContent = 'Saving...';
+
+            database.ref("users/" + userId + "/favourites").set(favourites)
+                .then(() => {
+                    btnText.textContent = 'Success! Redirecting...';
+                    
+                    // Animate all sections out
+                    anime({
+                        targets: '.section, .header, .btn-primary',
+                        scale: [1, 0.9],
+                        opacity: [1, 0],
+                        duration: 400,
+                        easing: 'easeInQuad',
+                        complete: () => {
+                            window.location.href = "profile.html";
+                        }
+                    });
+                })
+                .catch((error) => {
+                    btn.disabled = false;
+                    btnText.textContent = 'Save and Continue to Dashboard';
+                    alert("Error saving favourites: " + error.message);
+                    
+                    // Shake animation on error
+                    anime({
+                        targets: btn,
+                        translateX: [0, -10, 10, -10, 10, 0],
+                        duration: 500,
+                        easing: 'easeInOutQuad'
+                    });
+                });
+        });
+    </script>
+</body>
+</html>

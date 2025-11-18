@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediaMate - Your Entertainment Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: #0a0a0a;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 20px 60px;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .navbar .logo {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .navbar .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .navbar .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .navbar .nav-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .navbar .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+
+        .navbar .nav-links a:hover {
+            color: #fff;
+        }
+
+        .navbar .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 120px 20px 60px;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Scroll Sections */
+        .scroll-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 80px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scroll-section.intro-section {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+        }
+
+        .scroll-section.movies-section {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+
+        .scroll-section.webseries-section {
+            background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
+        }
+
+        .scroll-section.music-section {
+            background: linear-gradient(135deg, #1a1a2e 0%, #0f172a 100%);
+        }
+
+        .scroll-section.books-section {
+            background: linear-gradient(135deg, #0f172a 0%, #1a1a2e 100%);
+        }
+
+        .scroll-section.cta-section {
+            background: linear-gradient(135deg, #1a1a2e 0%, #0a0a0a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cta-section .scroll-content {
+            text-align: center;
+            padding: 60px 40px;
+        }
+
+        .cta-section h2 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .cta-section .description {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 700px;
+            margin: 0 auto 40px;
+            line-height: 1.8;
+        }
+
+        .cta-question {
+            font-size: 3.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 20px auto 15px;
+            text-align: center;
+        }
+
+        /* Content showcase styles */
+        .content-showcase {
+            width: 100%;
+            overflow: hidden;
+            margin: 40px auto 0;
+            position: relative;
+        }
+
+        .showcase-header {
+            margin-bottom: 50px;
+            padding: 0 60px;
+        }
+
+        .showcase-header h3 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .showcase-header p {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Horizontal scrolling container */
+        .posters-scroll-container {
+            position: relative;
+            padding: 20px 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .posters-scroll-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .posters-grid {
+            display: flex;
+            gap: 30px;
+            padding: 20px 60px;
+            opacity: 0;
+            will-change: transform;
+        }
+
+        /* Lock scroll position initially */
+        .posters-grid.locked {
+            pointer-events: none;
+        }
+
+        .poster-card {
+            flex: 0 0 250px;
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .poster-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.4);
+            border-color: rgba(102, 126, 234, 0.5);
+            z-index: 10;
+        }
+
+        .poster-card img {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .poster-info {
+            padding: 15px;
+            background: rgba(10, 10, 10, 0.9);
+            backdrop-filter: blur(10px);
+        }
+
+        .poster-info h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .poster-info .meta {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .poster-info .rating {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        /* Music Album Card */
+        .album-card {
+            flex: 0 0 220px;
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .album-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.4);
+            z-index: 10;
+        }
+
+        .album-card img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+        }
+
+        .album-info {
+            padding: 15px;
+            background: rgba(10, 10, 10, 0.9);
+        }
+
+        .album-info h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .album-info .artist {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Book Card */
+        .book-card {
+            flex: 0 0 200px;
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .book-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.4);
+            z-index: 10;
+        }
+
+        .book-card img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+        }
+
+        .book-info {
+            padding: 15px;
+            background: rgba(10, 10, 10, 0.9);
+        }
+
+        .book-info h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .book-info .author {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Gradient fade at edges */
+        .posters-scroll-container::before,
+        .posters-scroll-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100px;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .posters-scroll-container::before {
+            left: 0;
+            background: linear-gradient(to right, rgba(26, 26, 46, 1), transparent);
+        }
+
+        .posters-scroll-container::after {
+            right: 0;
+            background: linear-gradient(to left, rgba(26, 26, 46, 1), transparent);
+        }
+
+        .scroll-content {
+            opacity: 0;
+            transform: translateY(100px) scale(0.9);
+            transition: none;
+            max-width: 900px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .scroll-content.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        /* Hide elements initially for scroll animation */
+        .scroll-content .mega-icon,
+        .scroll-content h2,
+        .scroll-content .description,
+        .scroll-content .feature-list li {
+            opacity: 0;
+        }
+
+        .mega-icon {
+            font-size: 120px;
+            margin-bottom: 40px;
+            display: inline-block;
+            filter: drop-shadow(0 0 30px rgba(102, 126, 234, 0.5));
+        }
+
+        .scroll-section h2 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+
+        .scroll-section .description {
+            font-size: 1.4rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 30px;
+            font-weight: 300;
+            line-height: 1.8;
+        }
+
+        .scroll-section .feature-list {
+            list-style: none;
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 20px;
+        }
+
+        .scroll-section .feature-list li {
+            margin: 12px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .scroll-section .feature-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #38ef7d;
+            font-weight: bold;
+            font-size: 1.3rem;
+        }
+
+        .floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .floating-circle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.1;
+        }
+
+        .floating-circle.circle1 {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            top: -200px;
+            right: -200px;
+        }
+
+        .floating-circle.circle2 {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, #f093fb, #667eea);
+            bottom: -150px;
+            left: -150px;
+        }
+
+        .cta-buttons {
+            margin-top: 60px;
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 0 20px;
+        }
+
+        .cta-buttons .btn {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .btn-journey {
+            padding: 22px 65px;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50px;
+            box-shadow: 0 20px 50px rgba(102, 126, 234, 0.5);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-journey .arrow {
+            font-size: 24px;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: inline-block;
+        }
+
+        .btn-journey::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #764ba2 0%, #f093fb 100%);
+            transition: left 0.5s ease;
+            z-index: -1;
+        }
+
+        .btn-journey:hover::before {
+            left: 0;
+        }
+
+        .btn-journey:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 25px 60px rgba(102, 126, 234, 0.8);
+        }
+
+        .btn-journey:hover .arrow {
+            transform: translateX(8px);
+        }
+
+        .cta-buttons .btn.show {
+            animation: buttonSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes buttonSlideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+            top: -250px;
+            right: -250px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(118, 75, 162, 0.1) 0%, transparent 70%);
+            bottom: -200px;
+            left: -200px;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-section h1 {
+            font-size: 5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+
+        .hero-section .subtitle {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+
+        .button-container {
+            margin-top: 40px;
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 16px 48px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.6);
+            transform: translateY(-3px);
+        }
+
+        /* Footer */
+        footer {
+            padding: 60px;
+            background: #0a0a0a;
+            border-top: none;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 40px;
+        }
+
+        footer .info {
+            font-size: 14px;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+        }
+
+        /* Scroll Progress Bar */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            z-index: 9999;
+            transition: width 0.1s ease;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+            }
+
+            .navbar .logo {
+                font-size: 24px;
+            }
+
+            .navbar .nav-links {
+                gap: 20px;
+            }
+
+            .scroll-section h2 {
+                font-size: 2.5rem;
+            }
+
+            .mega-icon {
+                font-size: 80px;
+                margin-bottom: 30px;
+            }
+
+            .scroll-section .description {
+                font-size: 1.1rem;
+            }
+
+            .showcase-header h3 {
+                font-size: 2rem;
+            }
+
+            .showcase-header p {
+                font-size: 1rem;
+            }
+
+            .showcase-header {
+                padding: 0 30px;
+            }
+
+            .posters-grid {
+                gap: 20px;
+                padding: 20px 30px;
+            }
+
+            .poster-card {
+                flex: 0 0 180px;
+            }
+
+            .poster-card img {
+                height: 250px;
+            }
+
+            .album-card {
+                flex: 0 0 160px;
+            }
+
+            .album-card img {
+                height: 160px;
+            }
+
+            .book-card {
+                flex: 0 0 150px;
+            }
+
+            .book-card img {
+                height: 220px;
+            }
+
+            .poster-info h4,
+            .album-info h4,
+            .book-info h4 {
+                font-size: 0.85rem;
+            }
+
+            .posters-scroll-container::before,
+            .posters-scroll-container::after {
+                width: 50px;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .btn {
+                padding: 14px 36px;
+            }
+
+            .cta-section h2 {
+                font-size: 2.5rem;
+            }
+
+            .cta-section .description {
+                font-size: 1.1rem;
+            }
+
+            .cta-buttons {
+                gap: 20px;
+                margin-top: 40px;
+            }
+
+            .btn-journey {
+                padding: 18px 50px;
+                font-size: 18px;
+            }
+
+            .btn-journey .arrow {
+                font-size: 20px;
+            }
+
+            .floating-circle.circle1 {
+                width: 250px;
+                height: 250px;
+            }
+
+            .floating-circle.circle2 {
+                width: 200px;
+                height: 200px;
+            }
+        }
+
+        /* Fade in animation class */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <a href="index.html" class="logo">MediaMate</a>
+        <ul class="nav-links">
+            <li><a href="about.html">About</a></li>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="signup.html">Sign Up</a></li>
+        </ul>
+    </nav>
+
+    <!-- Intro Section -->
+    <div class="scroll-section intro-section">
+        <div class="floating-elements">
+            <div class="floating-circle circle1"></div>
+            <div class="floating-circle circle2"></div>
+        </div>
+        <div class="scroll-content" data-scroll-section="intro">
+            <div class="mega-icon">🎬</div>
+            <h2>Introducing MediaMate</h2>
+            <p class="description">Your centralized hub for personalized entertainment recommendations</p>
+            <p class="description" style="font-size: 1.1rem; margin-top: 40px;">Discover content across all your favorite media types</p>
+        </div>
+    </div>
+
+    <!-- Movies Section -->
+    <div class="scroll-section movies-section">
+        <div class="floating-elements">
+            <div class="floating-circle circle1"></div>
+        </div>
+        <div class="scroll-content" data-scroll-section="movies">
+            <div class="showcase-header">
+                <h3>🎬 Latest Movies</h3>
+                <p>Trending blockbusters and must-watch films</p>
+            </div>
+            <div class="content-showcase">
+                <div class="posters-scroll-container">
+                    <div class="posters-grid locked" id="moviesGrid">
+                        <!-- Movies will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Web Series Section -->
+    <div class="scroll-section webseries-section">
+        <div class="floating-elements">
+            <div class="floating-circle circle2"></div>
+        </div>
+        <div class="scroll-content" data-scroll-section="webseries">
+            <div class="showcase-header">
+                <h3>📺 Popular Web Series</h3>
+                <p>Binge-worthy series everyone's talking about</p>
+            </div>
+            <div class="content-showcase">
+                <div class="posters-scroll-container">
+                    <div class="posters-grid locked" id="webseriesGrid">
+                        <!-- Web series will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Music Section -->
+    <div class="scroll-section music-section">
+        <div class="floating-elements">
+            <div class="floating-circle circle1"></div>
+        </div>
+        <div class="scroll-content" data-scroll-section="music">
+            <div class="showcase-header">
+                <h3>🎵 Trending Music</h3>
+                <p>Hot tracks and top albums of the moment</p>
+            </div>
+            <div class="content-showcase">
+                <div class="posters-scroll-container">
+                    <div class="posters-grid locked" id="musicGrid">
+                        <!-- Music will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Books Section -->
+    <div class="scroll-section books-section">
+        <div class="floating-elements">
+            <div class="floating-circle circle2"></div>
+        </div>
+        <div class="scroll-content" data-scroll-section="books">
+            <div class="showcase-header">
+                <h3>📚 Bestselling Books</h3>
+                <p>Top reads and literary masterpieces</p>
+            </div>
+            <div class="content-showcase">
+                <div class="posters-scroll-container">
+                    <div class="posters-grid locked" id="booksGrid">
+                        <!-- Books will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="scroll-section cta-section">
+        <div class="floating-elements">
+            <div class="floating-circle circle1"></div>
+            <div class="floating-circle circle2"></div>
+        </div>
+        <div class="scroll-content" data-scroll-section="cta">
+            <p class="cta-question">Ready to discover amazing content?</p>
+            <div class="cta-buttons">
+                <a href="signup.html" class="btn btn-journey">
+                    Start Your Journey
+                    <span class="arrow">→</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="info">
+                <p>&copy; 2024 MediaMate | All rights reserved.</p>
+                <p>Email: hello@mediamate.com | Phone: +91 12345 67890</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // API Keys and configurations
+        const OMDB_API_KEY = '6c6fb997';
+        const SPOTIFY_CLIENT_ID = '4acfb5c3c58448a3a6fc909910dc0282';
+        const SPOTIFY_CLIENT_SECRET = 'f7fbb11f27954ab08687ff32dfdbecfb';
+
+        // Track if content has been fetched
+        let contentFetched = false;
+
+        // Fetch popular movies
+        async function fetchMovies() {
+            const popularMovies = ['Oppenheimer', 'Barbie', 'Dune', 'Inception', 'Interstellar', 'The Dark Knight', 'Avatar', 'Titanic'];
+            const moviesGrid = document.getElementById('moviesGrid');
+            
+            // Prevent re-fetching
+            if (moviesGrid.children.length > 0) return;
+            
+            for (const movie of popularMovies) {
+                try {
+                    const response = await fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(movie)}&apikey=${OMDB_API_KEY}`);
+                    const data = await response.json();
+                    
+                    if (data.Response === 'True') {
+                        const card = document.createElement('div');
+                        card.className = 'poster-card';
+                        card.innerHTML = `
+                            <img src="${data.Poster !== 'N/A' ? data.Poster : 'https://via.placeholder.com/200x300?text=No+Poster'}" alt="${data.Title}">
+                            <div class="poster-info">
+                                <h4>${data.Title}</h4>
+                                <div class="meta">${data.Year} • ${data.Genre?.split(',')[0]}</div>
+                                ${data.imdbRating !== 'N/A' ? `<span class="rating">⭐ ${data.imdbRating}</span>` : ''}
+                            </div>
+                        `;
+                        moviesGrid.appendChild(card);
+                    }
+                } catch (error) {
+                    console.error('Error fetching movie:', error);
+                }
+            }
+        }
+
+        // Fetch popular web series
+        async function fetchWebSeries() {
+            const popularSeries = ['Breaking Bad', 'Game of Thrones', 'Stranger Things', 'The Crown', 'Wednesday', 'The Last of Us', 'House of the Dragon', 'The Mandalorian'];
+            const webseriesGrid = document.getElementById('webseriesGrid');
+            
+            // Prevent re-fetching
+            if (webseriesGrid.children.length > 0) return;
+            
+            for (const series of popularSeries) {
+                try {
+                    const response = await fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(series)}&type=series&apikey=${OMDB_API_KEY}`);
+                    const data = await response.json();
+                    
+                    if (data.Response === 'True') {
+                        const card = document.createElement('div');
+                        card.className = 'poster-card';
+                        card.innerHTML = `
+                            <img src="${data.Poster !== 'N/A' ? data.Poster : 'https://via.placeholder.com/200x300?text=No+Poster'}" alt="${data.Title}">
+                            <div class="poster-info">
+                                <h4>${data.Title}</h4>
+                                <div class="meta">${data.Year} • ${data.Genre?.split(',')[0]}</div>
+                                ${data.imdbRating !== 'N/A' ? `<span class="rating">⭐ ${data.imdbRating}</span>` : ''}
+                            </div>
+                        `;
+                        webseriesGrid.appendChild(card);
+                    }
+                } catch (error) {
+                    console.error('Error fetching series:', error);
+                }
+            }
+        }
+
+        // Get Spotify Access Token
+        async function getSpotifyToken() {
+            try {
+                const response = await fetch('https://accounts.spotify.com/api/token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Authorization': 'Basic ' + btoa(SPOTIFY_CLIENT_ID + ':' + SPOTIFY_CLIENT_SECRET)
+                    },
+                    body: 'grant_type=client_credentials'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Token request failed: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.access_token) {
+                    console.log('Spotify token obtained successfully');
+                    return data.access_token;
+                } else {
+                    console.error('No access token in response:', data);
+                    return null;
+                }
+            } catch (error) {
+                console.error('Error getting Spotify token:', error);
+                return null;
+            }
+        }
+
+        // Fetch popular music
+        async function fetchMusic() {
+            const musicGrid = document.getElementById('musicGrid');
+            
+            // Prevent re-fetching
+            if (musicGrid.children.length > 0) return;
+            
+            const token = await getSpotifyToken();
+            if (!token) {
+                console.error('Failed to get Spotify token');
+                return;
+            }
+            
+            try {
+                const response = await fetch('https://api.spotify.com/v1/browse/featured-playlists?limit=8', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Spotify API error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.playlists && data.playlists.items) {
+                    data.playlists.items.forEach(playlist => {
+                        const card = document.createElement('div');
+                        card.className = 'album-card';
+                        card.innerHTML = `
+                            <img src="${playlist.images[0]?.url || 'https://via.placeholder.com/200x200?text=No+Image'}" alt="${playlist.name}">
+                            <div class="album-info">
+                                <h4>${playlist.name}</h4>
+                                <div class="artist">${playlist.description?.substring(0, 50) || 'Playlist'}...</div>
+                            </div>
+                        `;
+                        musicGrid.appendChild(card);
+                    });
+                    console.log(`Loaded ${data.playlists.items.length} music playlists`);
+                } else {
+                    console.error('No playlists found in Spotify response');
+                }
+            } catch (error) {
+                console.error('Error fetching music:', error);
+                // Add fallback content if API fails
+                const fallbackPlaylists = [
+                    { name: 'Today\'s Top Hits', description: 'The hottest tracks right now' },
+                    { name: 'RapCaviar', description: 'New music from hip hop\'s biggest' },
+                    { name: 'Rock Classics', description: 'Rock legends & epic songs' },
+                    { name: 'Chill Vibes', description: 'Kick back to relaxing beats' },
+                    { name: 'Pop Rising', description: 'New pop music on the rise' },
+                    { name: 'Jazz Classics', description: 'The greatest jazz recordings' },
+                    { name: 'Electronic Mix', description: 'Fresh electronic music' },
+                    { name: 'Indie Hits', description: 'The best indie music' }
+                ];
+                
+                fallbackPlaylists.forEach(playlist => {
+                    const card = document.createElement('div');
+                    card.className = 'album-card';
+                    card.innerHTML = `
+                        <img src="https://via.placeholder.com/200x200/667eea/ffffff?text=${encodeURIComponent(playlist.name)}" alt="${playlist.name}">
+                        <div class="album-info">
+                            <h4>${playlist.name}</h4>
+                            <div class="artist">${playlist.description}</div>
+                        </div>
+                    `;
+                    musicGrid.appendChild(card);
+                });
+            }
+        }
+
+        // Fetch popular books
+        async function fetchBooks() {
+            const popularBooks = [
+                'Harry Potter and the Philosopher\'s Stone',
+                'The Great Gatsby',
+                'To Kill a Mockingbird',
+                '1984',
+                'Pride and Prejudice',
+                'The Catcher in the Rye',
+                'The Hobbit',
+                'The Da Vinci Code'
+            ];
+            const booksGrid = document.getElementById('booksGrid');
+            
+            // Prevent re-fetching
+            if (booksGrid.children.length > 0) return;
+            
+            for (const book of popularBooks) {
+                try {
+                    const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(book)}&maxResults=1`);
+                    const data = await response.json();
+                    
+                    if (data.items && data.items.length > 0) {
+                        const bookData = data.items[0].volumeInfo;
+                        const card = document.createElement('div');
+                        card.className = 'book-card';
+                        card.innerHTML = `
+                            <img src="${bookData.imageLinks?.thumbnail || 'https://via.placeholder.com/200x280?text=No+Cover'}" alt="${bookData.title}">
+                            <div class="book-info">
+                                <h4>${bookData.title}</h4>
+                                <div class="author">${bookData.authors ? bookData.authors[0] : 'Unknown Author'}</div>
+                            </div>
+                        `;
+                        booksGrid.appendChild(card);
+                    }
+                } catch (error) {
+                    console.error('Error fetching book:', error);
+                }
+            }
+        }
+
+        // Load all content
+        console.log('Starting to load all content...');
+        fetchMovies();
+        fetchWebSeries();
+        fetchMusic();
+        fetchBooks();
+
+        // Initialize Lenis Smooth Scroll
+        const lenis = new Lenis({
+            duration: 1.5,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            smooth: true,
+            smoothTouch: false,
+        });
+
+        function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+
+        // Scroll Progress Bar
+        window.addEventListener('scroll', () => {
+            const scrolled = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+            document.getElementById('scrollProgress').style.width = scrolled + '%';
+        });
+
+        // Scroll-triggered animations
+        const scrollSections = document.querySelectorAll('.scroll-content');
+        
+        // Track which sections have been animated
+        const animatedSections = new Set();
+        
+        const observerOptions = {
+            threshold: 0.2,
+            rootMargin: '0px 0px -20% 0px'
+        };
+
+        const scrollObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const content = entry.target;
+                    const section = content.getAttribute('data-scroll-section');
+                    
+                    // Only animate once per section
+                    if (animatedSections.has(section)) return;
+                    animatedSections.add(section);
+                    
+                    // Background transition
+                    content.classList.add('active');
+                    
+                    // Progressive animation sequence
+                    const animationSequence = anime.timeline({
+                        easing: 'easeOutExpo'
+                    });
+                    
+                    // Animate showcase header
+                    const showcaseHeader = content.querySelector('.showcase-header');
+                    if (showcaseHeader) {
+                        animationSequence.add({
+                            targets: showcaseHeader,
+                            opacity: [0, 1],
+                            translateY: [50, 0],
+                            duration: 800
+                        });
+                    }
+                    
+                    // Animate intro section normally
+                    if (section === 'intro') {
+                        const icon = content.querySelector('.mega-icon');
+                        if (icon) {
+                            animationSequence.add({
+                                targets: icon,
+                                scale: [0, 1],
+                                rotate: [-180, 0],
+                                opacity: [0, 1],
+                                duration: 1000,
+                                easing: 'easeOutElastic(1, .8)'
+                            });
+                        }
+                        
+                        const heading = content.querySelector('h2');
+                        if (heading) {
+                            animationSequence.add({
+                                targets: heading,
+                                opacity: [0, 1],
+                                translateY: [80, 0],
+                                scale: [0.8, 1],
+                                duration: 1200,
+                            }, '-=600');
+                        }
+                        
+                        const descriptions = content.querySelectorAll('.description');
+                        if (descriptions.length > 0) {
+                            animationSequence.add({
+                                targets: descriptions,
+                                opacity: [0, 1],
+                                translateY: [50, 0],
+                                duration: 1000,
+                                delay: anime.stagger(200)
+                            }, '-=800');
+                        }
+                    }
+                    
+                    // Animate poster grids
+                    const postersGrid = content.querySelector('.posters-grid');
+                    if (postersGrid) {
+                        // Wait for content to load before animating
+                        const checkAndAnimate = setInterval(() => {
+                            const cards = postersGrid.querySelectorAll('.poster-card, .album-card, .book-card');
+                            if (cards.length > 0) {
+                                clearInterval(checkAndAnimate);
+                                
+                                animationSequence.add({
+                                    targets: postersGrid,
+                                    opacity: [0, 1],
+                                    duration: 800
+                                }, '-=400');
+                                
+                                // Animate cards from left with stagger
+                                animationSequence.add({
+                                    targets: cards,
+                                    opacity: [0, 1],
+                                    translateX: [-100, 0],
+                                    scale: [0.9, 1],
+                                    duration: 800,
+                                    delay: anime.stagger(100),
+                                    easing: 'easeOutExpo'
+                                }, '-=600');
+                            }
+                        }, 100);
+                        
+                        // Timeout after 3 seconds
+                        setTimeout(() => clearInterval(checkAndAnimate), 3000);
+                    }
+                    
+                    // Animate CTA buttons
+                    if (section === 'cta') {
+                        const buttons = content.querySelectorAll('.btn');
+                        animationSequence.add({
+                            targets: buttons,
+                            opacity: [0, 1],
+                            translateY: [50, 0],
+                            scale: [0.8, 1],
+                            duration: 800,
+                            delay: anime.stagger(150),
+                            easing: 'easeOutElastic(1, .6)'
+                        }, '-=400');
+                    }
+                }
+            });
+        }, observerOptions);
+
+        // Observe all scroll sections
+        scrollSections.forEach(section => {
+            scrollObserver.observe(section);
+        });
+
+        // Animate floating circles
+        anime({
+            targets: '.floating-circle',
+            translateY: [0, -30, 0],
+            translateX: [0, 15, 0],
+            duration: 8000,
+            easing: 'easeInOutQuad',
+            loop: true
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    lenis.scrollTo(target, {
+                        offset: -80,
+                        duration: 1.5
+                    });
+                }
+            });
+        });
+
+        // Horizontal scroll animation based on vertical scroll
+        function setupHorizontalScroll() {
+            const scrollContainers = document.querySelectorAll('.posters-scroll-container');
+            
+            console.log(`Found ${scrollContainers.length} scroll containers`);
+            
+            // Store scroll positions for each section
+            const scrollPositions = new Map();
+            
+            scrollContainers.forEach((container, index) => {
+                const grid = container.querySelector('.posters-grid');
+                const section = container.closest('.scroll-section');
+                const sectionKey = `section-${index}`;
+                
+                console.log(`Setting up horizontal scroll for section ${index}:`, section.className);
+                
+                // Initialize scroll position
+                scrollPositions.set(sectionKey, 0);
+                
+                // Observer to enable horizontal scroll when section is in view
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            // Unlock horizontal scroll when content is loaded
+                            setTimeout(() => {
+                                grid.classList.remove('locked');
+                            }, 1000);
+                        }
+                    });
+                }, {
+                    threshold: 0.1
+                });
+                
+                observer.observe(section);
+                
+                // Track which sections are currently being animated
+                let isAnimating = false;
+                
+                // Animate horizontal scroll based on vertical scroll progress
+                function updateHorizontalScroll() {
+                    const sectionRect = section.getBoundingClientRect();
+                    const sectionHeight = section.offsetHeight;
+                    const windowHeight = window.innerHeight;
+                    
+                    // Only update if section is in viewport
+                    if (sectionRect.bottom < 0 || sectionRect.top > windowHeight) {
+                        return;
+                    }
+                    
+                    // Calculate scroll progress through this section (0 to 1)
+                    const scrollProgress = Math.max(0, Math.min(1, 
+                        (windowHeight - sectionRect.top) / (windowHeight + sectionHeight * 0.6)
+                    ));
+                    
+                    // Calculate how far to scroll horizontally
+                    const gridWidth = grid.scrollWidth;
+                    const containerWidth = container.offsetWidth;
+                    const maxScroll = Math.max(0, gridWidth - containerWidth);
+                    
+                    // Apply horizontal scroll based on vertical scroll progress
+                    if (scrollProgress > 0.1 && scrollProgress < 0.9) {
+                        const adjustedProgress = (scrollProgress - 0.1) / 0.8; // Normalize to 0-1
+                        const targetScroll = maxScroll * adjustedProgress;
+                        
+                        // Store the calculated position
+                        scrollPositions.set(sectionKey, targetScroll);
+                        
+                        // Smooth scroll animation using requestAnimationFrame
+                        if (!isAnimating) {
+                            isAnimating = true;
+                            const currentScroll = container.scrollLeft;
+                            const diff = targetScroll - currentScroll;
+                            
+                            // Only animate if difference is significant
+                            if (Math.abs(diff) > 1) {
+                                container.scrollLeft = currentScroll + diff * 0.1;
+                            } else {
+                                container.scrollLeft = targetScroll;
+                            }
+                            
+                            requestAnimationFrame(() => {
+                                isAnimating = false;
+                            });
+                        }
+                    } else if (scrollProgress >= 0.9) {
+                        // Ensure we're at the end when fully scrolled
+                        const finalPosition = maxScroll;
+                        scrollPositions.set(sectionKey, finalPosition);
+                        if (Math.abs(container.scrollLeft - finalPosition) > 1) {
+                            container.scrollLeft = finalPosition;
+                        }
+                    } else if (scrollProgress <= 0.1) {
+                        // Reset to start when scrolling back up
+                        scrollPositions.set(sectionKey, 0);
+                        if (container.scrollLeft > 1) {
+                            container.scrollLeft = 0;
+                        }
+                    }
+                }
+                
+                // Update on scroll with throttling
+                let scrollTimeout;
+                lenis.on('scroll', () => {
+                    if (scrollTimeout) clearTimeout(scrollTimeout);
+                    scrollTimeout = setTimeout(updateHorizontalScroll, 10);
+                });
+            });
+        }
+
+        // Initialize horizontal scroll after content loads
+        setTimeout(() => {
+            setupHorizontalScroll();
+        }, 2000);
+    </script>
+</body>
+</html>
