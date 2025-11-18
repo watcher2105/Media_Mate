@@ -1,0 +1,43 @@
+body {
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(135deg, #3a1c71, #d76d77, #ffaf7b);
+  color: #fff;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+}
+
+.container {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  width: 90%;
+  max-width: 600px;
+}
+
+select, button {
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 8px;
+  font-size: 1rem;
+  border: none;
+}
+
+button {
+  background: #4e9af1;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #367bd6;
+}
+
+.recommendations {
+  margin-top: 20px;
+  text-align: left;
+}
