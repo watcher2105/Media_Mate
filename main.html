@@ -2612,7 +2612,7 @@
     const genAI = new GoogleGenerativeAI(API_KEY);
 
     // Function to toggle the chatbot widget
-    function toggleBot() {
+    window.toggleBot = function() {
       const bot = document.getElementById("mediaMate");
       const toggleButton = document.getElementById("botToggle");
       if (bot.style.display === "none" || !bot.style.display) {
@@ -2620,7 +2620,7 @@
         toggleButton.style.display = "none";
       } else {
         bot.style.display = "none";
-        toggleButton.style.display = "block";
+        toggleButton.style.display = "flex";
       }
     }
 
@@ -2793,7 +2793,7 @@
     document.getElementById("scrollDownBtn").addEventListener("click", () => scrollOutput("down"));
 
     // Add event listener for the toggle button
-    document.getElementById("botToggle").addEventListener("click", toggleBot);
+    document.getElementById("botToggle").addEventListener("click", window.toggleBot);
   </script>
 
   <!-- Anime.js for animations -->
