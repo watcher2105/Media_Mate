@@ -140,7 +140,7 @@ class MovieRecommender {
         const detailedRecommendations = recommendations.map((rec) => {
             return {
                 Title: rec.title,
-                Poster: `https://via.placeholder.com/300x450?text=${encodeURIComponent(rec.title)}`, // Placeholder
+                Poster: `https://placehold.co/300x450/1a1a2e/ffffff?text=${encodeURIComponent(rec.title)}`, // Placeholder
                 id: rec.id,
                 imdbID: rec.id,
                 score: rec.score,
