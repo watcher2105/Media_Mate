@@ -1015,7 +1015,7 @@
                         }
                     };
 
-                    const requestGeminiModel = async ({ version, name }, prompt) => {
+                    const requestGeminiModel = async ({ version, name }, prompt, returnRawText = false) => {
                         const payload = {
                             contents: [
                                 {
@@ -1055,6 +1055,10 @@
                             ?.map(part => part.text)
                             .join(' ');
 
+                        if (returnRawText) {
+                            return textResponse;
+                        }
+
                         return parseGeminiJson(textResponse);
                     };
 
@@ -1074,6 +1078,147 @@
                         }
 
                         throw lastError || new Error('Gemini API is unavailable.');
+                    };
+
+                    const getAIRecommendations = async (category, userFavorites) => {
+                        try {
+                            console.log(`Getting AI recommendations for ${category} based on:`, userFavorites);
+                            
+                            // Build category-specific prompt
+                            let prompt = '';
+                            let categoryName = '';
+                            
+                            switch(category) {
+                                case 'movies':
+                                    categoryName = 'movies';
+                                    prompt = `Based on these favorite movies: ${userFavorites.join(', ')}, recommend 9 similar movies. Return ONLY a JSON array with objects containing exactly these fields: {"Title": "movie name", "Year": "release year"}. No explanations, just the JSON array.`;
+                                    break;
+                                case 'webseries':
+                                    categoryName = 'web series';
+                                    prompt = `Based on these favorite TV shows/web series: ${userFavorites.join(', ')}, recommend 9 similar TV shows or web series. Return ONLY a JSON array with objects containing exactly these fields: {"Title": "show name", "Year": "release year"}. No explanations, just the JSON array.`;
+                                    break;
+                                case 'music':
+                                    categoryName = 'songs';
+                                    prompt = `Based on these favorite songs: ${userFavorites.join(', ')}, recommend 9 similar songs. Return ONLY a JSON array with objects containing exactly these fields: {"Song": "song name", "Artist": "artist name"}. No explanations, just the JSON array.`;
+                                    break;
+                                case 'books':
+                                    categoryName = 'books';
+                                    prompt = `Based on these favorite books: ${userFavorites.join(', ')}, recommend 9 similar books. Return ONLY a JSON array with objects containing exactly these fields: {"Title": "book name", "Author": "author name"}. No explanations, just the JSON array.`;
+                                    break;
+                                default:
+                                    return [];
+                            }
+                            
+                            // Call Gemini API with fallback to multiple models
+                            let lastError = null;
+                            let aiResponse = null;
+                            
+                            for (let i = 0; i < GEMINI_MODEL_OPTIONS.length; i++) {
+                                const option = GEMINI_MODEL_OPTIONS[i];
+                                try {
+                                    const rawResponse = await requestGeminiModel(option, prompt, true);
+                                    // Parse the raw JSON array response
+                                    const cleaned = rawResponse.replace(/```json/gi, '').replace(/```/g, '').trim();
+                                    aiResponse = JSON.parse(cleaned);
+                                    console.log(`Successfully got AI recommendations from ${option.version}/${option.name}`);
+                                    break; // Success! Exit the loop
+                                } catch (error) {
+                                    console.warn(`Failed to get AI recommendations from ${option.version}/${option.name} (${error.statusCode || 'unknown'}):`, error.message);
+                                    lastError = error;
+                                    
+                                    // Add a small delay before trying the next model (especially for 503 errors)
+                                    if (i < GEMINI_MODEL_OPTIONS.length - 1 && (error.statusCode === 503 || error.statusCode === 429)) {
+                                        await new Promise(resolve => setTimeout(resolve, 1000)); // 1 second delay
+                                    }
+                                    // Continue trying other models instead of throwing immediately
+                                    continue;
+                                }
+                            }
+                            
+                            if (!aiResponse) {
+                                console.warn('All Gemini models failed or are unavailable. Skipping AI recommendations.', lastError?.message);
+                                return []; // Return empty array instead of throwing - AI recommendations are optional
+                            }
+                            
+                            console.log('AI response:', aiResponse);
+                            
+                            // Fetch details from appropriate API
+                            if (category === 'movies' || category === 'webseries') {
+                                const type = category === 'movies' ? 'movie' : 'series';
+                                const detailPromises = aiResponse.map(async (item) => {
+                                    const omdbData = await fetchOmdbDetails(item.Title, type);
+                                    
+                                    if (omdbData) {
+                                        return {
+                                            ...omdbData,
+                                            recommendationScore: 0.85 // AI recommendations get a good score
+                                        };
+                                    } else {
+                                        return {
+                                            Title: item.Title,
+                                            Poster: `https://placehold.co/300x450/1a1a2e/ffffff?text=${encodeURIComponent(item.Title)}`,
+                                            Year: item.Year || 'N/A',
+                                            Type: type,
+                                            Plot: `AI-recommended ${categoryName} based on your favorites`,
+                                            imdbID: '',
+                                            recommendationScore: 0.85
+                                        };
+                                    }
+                                });
+                                return await Promise.all(detailPromises);
+                            } else if (category === 'music') {
+                                const spotifyToken = await getSpotifyToken();
+                                const detailPromises = aiResponse.map(async (item) => {
+                                    const spotifyData = await fetchSpotifyTrackByName(item.Artist, item.Song, spotifyToken);
+                                    
+                                    if (spotifyData) {
+                                        return {
+                                            ...spotifyData,
+                                            recommendationScore: 0.85
+                                        };
+                                    } else {
+                                        return {
+                                            Title: `${item.Song} - ${item.Artist}`,
+                                            Artist: item.Artist,
+                                            Song: item.Song,
+                                            Poster: `https://placehold.co/300x450/1a1a2e/ffffff?text=${encodeURIComponent(item.Artist)}`,
+                                            Year: 'N/A',
+                                            Type: 'music',
+                                            Plot: `AI-recommended ${categoryName} based on your favorites`,
+                                            recommendationScore: 0.85
+                                        };
+                                    }
+                                });
+                                return await Promise.all(detailPromises);
+                            } else if (category === 'books') {
+                                const detailPromises = aiResponse.map(async (item) => {
+                                    const googleBooksData = await fetchBookByTitle(item.Title);
+                                    
+                                    if (googleBooksData) {
+                                        return {
+                                            ...googleBooksData,
+                                            recommendationScore: 0.85
+                                        };
+                                    } else {
+                                        return {
+                                            Title: item.Title,
+                                            Author: item.Author || 'Unknown',
+                                            Poster: `https://placehold.co/300x450/1a1a2e/ffffff?text=${encodeURIComponent(item.Title)}`,
+                                            Year: 'N/A',
+                                            Type: 'book',
+                                            Plot: `AI-recommended ${categoryName} based on your favorites`,
+                                            recommendationScore: 0.85
+                                        };
+                                    }
+                                });
+                                return await Promise.all(detailPromises);
+                            }
+                            
+                            return [];
+                        } catch (error) {
+                            console.error(`Error getting AI recommendations for ${category}:`, error);
+                            return [];
+                        }
                     };
 
                     const dedupeAndTrimList = (items, limit = 5) => {
@@ -1342,33 +1487,40 @@
                                     const modelRecommendations = movieRecommender.getRecommendationsWithDetails(movieTitles, 9);
                                     console.log('Model-based movie recommendations:', modelRecommendations);
                                     
-                                    // Fetch OMDB details for each recommended movie
-                                    const omdbPromises = modelRecommendations.map(async (movie) => {
-                                        const omdbData = await fetchOmdbDetails(movie.Title, 'movie');
+                                    if (modelRecommendations.length > 0) {
+                                        // Fetch OMDB details for each recommended movie
+                                        const omdbPromises = modelRecommendations.map(async (movie) => {
+                                            const omdbData = await fetchOmdbDetails(movie.Title, 'movie');
+                                            
+                                            if (omdbData) {
+                                                // Use OMDB data with recommendation score
+                                                return {
+                                                    ...omdbData,
+                                                    recommendationScore: movie.score
+                                                };
+                                            } else {
+                                                // Fallback to basic info if OMDB fails
+                                                return {
+                                                    Title: movie.Title,
+                                                    Poster: `https://placehold.co/300x450/1a1a2e/ffffff?text=${encodeURIComponent(movie.Title)}`,
+                                                    Year: 'N/A',
+                                                    Type: 'movie',
+                                                    Plot: 'Recommended based on your favorites',
+                                                    imdbID: movie.imdbID || movie.id,
+                                                    recommendationScore: movie.score
+                                                };
+                                            }
+                                        });
                                         
-                                        if (omdbData) {
-                                            // Use OMDB data with recommendation score
-                                            return {
-                                                ...omdbData,
-                                                recommendationScore: movie.score
-                                            };
-                                        } else {
-                                            // Fallback to basic info if OMDB fails
-                                            return {
-                                                Title: movie.Title,
-                                                Poster: `https://placehold.co/300x450/1a1a2e/ffffff?text=${encodeURIComponent(movie.Title)}`,
-                                                Year: 'N/A',
-                                                Type: 'movie',
-                                                Plot: 'Recommended based on your favorites',
-                                                imdbID: movie.imdbID || movie.id,
-                                                recommendationScore: movie.score
-                                            };
-                                        }
-                                    });
-                                    
-                                    // Wait for all OMDB fetches to complete
-                                    recommendationCache.movies = await Promise.all(omdbPromises);
-                                    console.log('Movie recommendations with OMDB data:', recommendationCache.movies.length, 'movies');
+                                        // Wait for all OMDB fetches to complete
+                                        recommendationCache.movies = await Promise.all(omdbPromises);
+                                        console.log('Movie recommendations with OMDB data:', recommendationCache.movies.length, 'movies');
+                                    } else {
+                                        // No matches in database, use AI fallback
+                                        console.log('No movie matches in database, using AI fallback...');
+                                        const aiMovies = await getAIRecommendations('movies', movieTitles);
+                                        recommendationCache.movies = aiMovies || [];
+                                    }
                                 } catch (movieError) {
                                     console.error('Error getting movie recommendations:', movieError);
                                 }
@@ -1382,30 +1534,37 @@
                                     const webseriesRecommendations = webseriesRecommender.getRecommendationsWithDetails(webseriesTitles, 9);
                                     console.log('Model-based webseries recommendations:', webseriesRecommendations);
                                     
-                                    // Fetch OMDB details for each recommended show
-                                    const omdbPromises = webseriesRecommendations.map(async (show) => {
-                                        const omdbData = await fetchOmdbDetails(show.Title, 'series');
+                                    if (webseriesRecommendations.length > 0) {
+                                        // Fetch OMDB details for each recommended show
+                                        const omdbPromises = webseriesRecommendations.map(async (show) => {
+                                            const omdbData = await fetchOmdbDetails(show.Title, 'series');
+                                            
+                                            if (omdbData) {
+                                                return {
+                                                    ...omdbData,
+                                                    recommendationScore: show.score
+                                                };
+                                            } else {
+                                                return {
+                                                    Title: show.Title,
+                                                    Poster: `https://placehold.co/300x450/1a1a2e/ffffff?text=${encodeURIComponent(show.Title)}`,
+                                                    Year: 'N/A',
+                                                    Type: 'series',
+                                                    Plot: 'Recommended based on your favorites',
+                                                    imdbID: show.imdbID || show.id,
+                                                    recommendationScore: show.score
+                                                };
+                                            }
+                                        });
                                         
-                                        if (omdbData) {
-                                            return {
-                                                ...omdbData,
-                                                recommendationScore: show.score
-                                            };
-                                        } else {
-                                            return {
-                                                Title: show.Title,
-                                                Poster: `https://placehold.co/300x450/1a1a2e/ffffff?text=${encodeURIComponent(show.Title)}`,
-                                                Year: 'N/A',
-                                                Type: 'series',
-                                                Plot: 'Recommended based on your favorites',
-                                                imdbID: show.imdbID || show.id,
-                                                recommendationScore: show.score
-                                            };
-                                        }
-                                    });
-                                    
-                                    recommendationCache.webseries = await Promise.all(omdbPromises);
-                                    console.log('Webseries recommendations with OMDB data:', recommendationCache.webseries.length, 'shows');
+                                        recommendationCache.webseries = await Promise.all(omdbPromises);
+                                        console.log('Webseries recommendations with OMDB data:', recommendationCache.webseries.length, 'shows');
+                                    } else {
+                                        // No matches in database, use AI fallback
+                                        console.log('No webseries matches in database, using AI fallback...');
+                                        const aiSeries = await getAIRecommendations('webseries', webseriesTitles);
+                                        recommendationCache.webseries = aiSeries || [];
+                                    }
                                 } catch (webseriesError) {
                                     console.error('Error getting webseries recommendations:', webseriesError);
                                 }
@@ -1419,34 +1578,41 @@
                                     const musicRecommendations = musicRecommender.getRecommendationsWithDetails(musicTitles, 9);
                                     console.log('Model-based music recommendations:', musicRecommendations);
                                     
-                                    // Fetch Spotify details for each recommended track
-                                    const spotifyToken = await getSpotifyToken();
-                                    const spotifyPromises = musicRecommendations.map(async (song) => {
-                                        const spotifyData = await fetchSpotifyTrackByName(song.Artist, song.Song, spotifyToken);
+                                    if (musicRecommendations.length > 0) {
+                                        // Fetch Spotify details for each recommended track
+                                        const spotifyToken = await getSpotifyToken();
+                                        const spotifyPromises = musicRecommendations.map(async (song) => {
+                                            const spotifyData = await fetchSpotifyTrackByName(song.Artist, song.Song, spotifyToken);
+                                            
+                                            if (spotifyData) {
+                                                // Use Spotify data with recommendation score
+                                                return {
+                                                    ...spotifyData,
+                                                    recommendationScore: song.score
+                                                };
+                                            } else {
+                                                // Fallback to basic info if Spotify fails
+                                                return {
+                                                    Title: song.Title,
+                                                    Artist: song.Artist,
+                                                    Song: song.Song,
+                                                    Poster: `https://placehold.co/300x450/1a1a2e/ffffff?text=${encodeURIComponent(song.Artist)}`,
+                                                    Year: 'N/A',
+                                                    Type: 'music',
+                                                    Plot: 'Recommended based on your favorites',
+                                                    recommendationScore: song.score
+                                                };
+                                            }
+                                        });
                                         
-                                        if (spotifyData) {
-                                            // Use Spotify data with recommendation score
-                                            return {
-                                                ...spotifyData,
-                                                recommendationScore: song.score
-                                            };
-                                        } else {
-                                            // Fallback to basic info if Spotify fails
-                                            return {
-                                                Title: song.Title,
-                                                Artist: song.Artist,
-                                                Song: song.Song,
-                                                Poster: `https://placehold.co/300x450/1a1a2e/ffffff?text=${encodeURIComponent(song.Artist)}`,
-                                                Year: 'N/A',
-                                                Type: 'music',
-                                                Plot: 'Recommended based on your favorites',
-                                                recommendationScore: song.score
-                                            };
-                                        }
-                                    });
-                                    
-                                    recommendationCache.music = await Promise.all(spotifyPromises);
-                                    console.log('Music recommendations with Spotify data:', recommendationCache.music.length, 'songs');
+                                        recommendationCache.music = await Promise.all(spotifyPromises);
+                                        console.log('Music recommendations with Spotify data:', recommendationCache.music.length, 'songs');
+                                    } else {
+                                        // No matches in database, use AI fallback
+                                        console.log('No music matches in database, using AI fallback...');
+                                        const aiMusic = await getAIRecommendations('music', musicTitles);
+                                        recommendationCache.music = aiMusic || [];
+                                    }
                                 } catch (musicError) {
                                     console.error('Error getting music recommendations:', musicError);
                                 }
@@ -1460,32 +1626,39 @@
                                     const bookRecommendations = bookRecommender.getRecommendationsWithDetails(bookTitles, 9);
                                     console.log('Model-based book recommendations:', bookRecommendations);
                                     
-                                    // Fetch Google Books details for each recommended book
-                                    const googleBooksPromises = bookRecommendations.map(async (book) => {
-                                        const googleBooksData = await fetchBookByTitle(book.Title);
+                                    if (bookRecommendations.length > 0) {
+                                        // Fetch Google Books details for each recommended book
+                                        const googleBooksPromises = bookRecommendations.map(async (book) => {
+                                            const googleBooksData = await fetchBookByTitle(book.Title);
+                                            
+                                            if (googleBooksData) {
+                                                // Use Google Books data with recommendation score
+                                                return {
+                                                    ...googleBooksData,
+                                                    recommendationScore: book.score
+                                                };
+                                            } else {
+                                                // Fallback to basic info if Google Books fails
+                                                return {
+                                                    Title: book.Title,
+                                                    Poster: `https://placehold.co/300x450/1a1a2e/ffffff?text=${encodeURIComponent(book.Title)}`,
+                                                    Year: 'N/A',
+                                                    Type: 'book',
+                                                    Plot: 'Recommended based on your favorites',
+                                                    Author: 'Unknown',
+                                                    recommendationScore: book.score
+                                                };
+                                            }
+                                        });
                                         
-                                        if (googleBooksData) {
-                                            // Use Google Books data with recommendation score
-                                            return {
-                                                ...googleBooksData,
-                                                recommendationScore: book.score
-                                            };
-                                        } else {
-                                            // Fallback to basic info if Google Books fails
-                                            return {
-                                                Title: book.Title,
-                                                Poster: `https://placehold.co/300x450/1a1a2e/ffffff?text=${encodeURIComponent(book.Title)}`,
-                                                Year: 'N/A',
-                                                Type: 'book',
-                                                Plot: 'Recommended based on your favorites',
-                                                Author: 'Unknown',
-                                                recommendationScore: book.score
-                                            };
-                                        }
-                                    });
-                                    
-                                    recommendationCache.books = await Promise.all(googleBooksPromises);
-                                    console.log('Book recommendations with Google Books data:', recommendationCache.books.length, 'books');
+                                        recommendationCache.books = await Promise.all(googleBooksPromises);
+                                        console.log('Book recommendations with Google Books data:', recommendationCache.books.length, 'books');
+                                    } else {
+                                        // No matches in database, use AI fallback
+                                        console.log('No book matches in database, using AI fallback...');
+                                        const aiBooks = await getAIRecommendations('books', bookTitles);
+                                        recommendationCache.books = aiBooks || [];
+                                    }
                                 } catch (bookError) {
                                     console.error('Error getting book recommendations:', bookError);
                                 }
