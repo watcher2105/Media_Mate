@@ -424,6 +424,9 @@
         </div>
     </div>
 
+    <!-- API Configuration -->
+    <script src="config.js?v=2"></script>
+    
     <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-database-compat.js"></script>
@@ -544,7 +547,7 @@
         };
 
         async function loadLatestSeries() {
-            const apiKey = "6c6fb997";
+            const apiKey = API_CONFIG.OMDB_API_KEY;
             const popularSeries = ['Breaking Bad', 'Game of Thrones', 'Stranger Things', 'The Crown', 
                                    'Wednesday', 'The Last of Us', 'House of Cards', 'Peaky Blinders',
                                    'Money Heist', 'Dark', 'The Witcher', 'Friends', 'The Office', 'Suits',
@@ -636,7 +639,7 @@
         }
 
         async function searchSeries(query) {
-            const apiKey = "6c6fb997";
+            const apiKey = API_CONFIG.OMDB_API_KEY;
             const url = `https://www.omdbapi.com/?s=${encodeURIComponent(query)}&type=series&apikey=${apiKey}`;
             const data = await fetchWithProxy(url);
             

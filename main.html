@@ -668,6 +668,9 @@
                 </div>
             </div>
         
+            <!-- API Configuration -->
+            <script src="config.js?v=2"></script>
+            
             <!-- Firebase SDK -->
             <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-app-compat.js"></script>
             <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-auth-compat.js"></script>
@@ -680,17 +683,8 @@
             <script src="recomandation system/Book Recomendation/book-recommender.js"></script>
         
             <script>
-                // Firebase Configuration
-                const firebaseConfig = {
-                    apiKey: "AIzaSyAmCKNLQa5D_VTTDApD5KRPGTxTvuMHZu4",
-                    authDomain: "mediamate-7be1d.firebaseapp.com",
-                    databaseURL: "https://mediamate-7be1d-default-rtdb.firebaseio.com",
-                    projectId: "mediamate-7be1d",
-                    storageBucket: "mediamate-7be1d.firebasestorage.app",
-                    messagingSenderId: "1070130926077",
-                    appId: "1:1070130926077:web:781de2dc1275d193af4994",
-                    measurementId: "G-BSV2LSNR6D"
-                };
+                // Firebase Configuration (from config.js)
+                const firebaseConfig = API_CONFIG.FIREBASE_CONFIG;
         
                 // Initialize Firebase
                 firebase.initializeApp(firebaseConfig);
@@ -954,7 +948,7 @@
                         }
                     });
 
-                    const GEMINI_API_KEY = 'AIzaSyBtGBG8qmwCafPDbLAD5aEtMeVyodeX22Y';
+                    const GEMINI_API_KEY = API_CONFIG.GEMINI_API_KEY;
                     const GEMINI_MODEL_OPTIONS = [
                         { version: 'v1beta', name: 'gemini-2.5-flash' },
                         { version: 'v1', name: 'gemini-2.5-flash' },
@@ -1227,7 +1221,7 @@
 
                     const fetchOmdbDetails = async (title, type) => {
                         try {
-                            const params = new URLSearchParams({ apikey: '6c6fb997', plot: 'short', t: title });
+                            const params = new URLSearchParams({ apikey: API_CONFIG.OMDB_API_KEY, plot: 'short', t: title });
                             if (type) {
                                 params.set('type', type);
                             }
@@ -1827,7 +1821,7 @@
         const fetchMovies = async (query = '') => {
             if (query) {
                 // Search mode
-                const url = `https://www.omdbapi.com/?apikey=6c6fb997&s=${query}&type=movie`;
+                const url = `https://www.omdbapi.com/?apikey=${API_CONFIG.OMDB_API_KEY}&s=${query}&type=movie`;
                 fetchWithProxy(url)
                     .then(data => displayItems(data.Search || [], 'movies', {
                         containerId: 'movies-results',
@@ -1842,7 +1836,7 @@
             } else {
                 // Popular mode - fetch multiple terms
                 const promises = popularMovieTerms.map(term => 
-                    fetchWithProxy(`https://www.omdbapi.com/?apikey=6c6fb997&s=${term}&type=movie`)
+                    fetchWithProxy(`https://www.omdbapi.com/?apikey=${API_CONFIG.OMDB_API_KEY}&s=${term}&type=movie`)
                         .then(data => data.Search || [])
                         .catch(() => [])
                 );
@@ -1870,7 +1864,7 @@
         const fetchWebseries = async (query = '') => {
             if (query) {
                 // Search mode
-                const url = `https://www.omdbapi.com/?apikey=6c6fb997&s=${query}&type=series`;
+                const url = `https://www.omdbapi.com/?apikey=${API_CONFIG.OMDB_API_KEY}&s=${query}&type=series`;
                 fetchWithProxy(url)
                     .then(data => displayItems(data.Search || [], 'webseries', {
                         containerId: 'webseries-results',
@@ -1885,7 +1879,7 @@
             } else {
                 // Popular mode - fetch multiple terms
                 const promises = popularSeriesTerms.map(term => 
-                    fetchWithProxy(`https://www.omdbapi.com/?apikey=6c6fb997&s=${term}&type=series`)
+                    fetchWithProxy(`https://www.omdbapi.com/?apikey=${API_CONFIG.OMDB_API_KEY}&s=${term}&type=series`)
                         .then(data => data.Search || [])
                         .catch(() => [])
                 );
@@ -2232,7 +2226,7 @@
                 let detailHtml = '';
 
                 if (normalizedType === 'movies' || normalizedType === 'webseries') {
-                    const params = new URLSearchParams({ apikey: '6c6fb997', plot: 'full' });
+                    const params = new URLSearchParams({ apikey: API_CONFIG.OMDB_API_KEY, plot: 'full' });
                     if (sourceId) {
                         params.set('i', sourceId);
                     } else if (title) {
@@ -2555,7 +2549,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
-                        'Authorization': `Basic ${btoa('4acfb5c3c58448a3a6fc909910dc0282:f7fbb11f27954ab08687ff32dfdbecfb')}`
+                        'Authorization': `Basic ${btoa(`${API_CONFIG.SPOTIFY_CLIENT_ID}:${API_CONFIG.SPOTIFY_CLIENT_SECRET}`)}`
                     },
                     body: 'grant_type=client_credentials'
                 });
@@ -2859,7 +2853,7 @@
                 return null;
             }
 
-            const params = new URLSearchParams({ apikey: "6c6fb997", t: name });
+            const params = new URLSearchParams({ apikey: API_CONFIG.OMDB_API_KEY, t: name });
             if (year) {
                 params.append("y", year);
             }

@@ -427,6 +427,9 @@
     </div>
 
     <!-- Firebase SDK -->
+    <!-- API Configuration -->
+    <script src="config.js?v=2"></script>
+    
     <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-database-compat.js"></script>
@@ -550,7 +553,7 @@
         };
 
         async function loadLatestMovies() {
-            const apiKey = "6c6fb997";
+            const apiKey = API_CONFIG.OMDB_API_KEY;
             const popularMovies = ['Inception', 'Interstellar', 'The Dark Knight', 'Avengers', 'Spiderman', 
                                    'Iron Man', 'Batman', 'Superman', 'Joker', 'Matrix', 'Titanic', 'Avatar',
                                    'Gladiator', 'Oppenheimer', 'Barbie', 'Dune'];
@@ -641,7 +644,7 @@
         }
 
         async function searchMovies(query) {
-            const apiKey = "6c6fb997";
+            const apiKey = API_CONFIG.OMDB_API_KEY;
             const url = `https://www.omdbapi.com/?s=${encodeURIComponent(query)}&type=movie&apikey=${apiKey}`;
             const data = await fetchWithProxy(url);
             

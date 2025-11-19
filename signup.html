@@ -358,6 +358,9 @@
         </div>
     </div>
 
+    <!-- API Configuration -->
+    <script src="config.js?v=2"></script>
+    
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-auth-compat.js"></script>
@@ -408,17 +411,8 @@
             }, 4000);
         }
 
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyAmCKNLQa5D_VTTDApD5KRPGTxTvuMHZu4",
-            authDomain: "mediamate-7be1d.firebaseapp.com",
-            databaseURL: "https://mediamate-7be1d-default-rtdb.firebaseio.com",
-            projectId: "mediamate-7be1d",
-            storageBucket: "mediamate-7be1d.firebasestorage.app",
-            messagingSenderId: "1070130926077",
-            appId: "1:1070130926077:web:781de2dc1275d193af4994",
-            measurementId: "G-BSV2LSNR6D"
-        };
+        // Firebase Configuration (from config.js)
+        const firebaseConfig = API_CONFIG.FIREBASE_CONFIG;
 
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
