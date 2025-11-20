@@ -4,25 +4,24 @@
 const API_CONFIG = {
     // OMDB API - Get your key from: http://www.omdbapi.com/apikey.aspx
     // Free tier: 1,000 requests per day
-    OMDB_API_KEY: '9f16bf57',
+    OMDB_API_KEY: 'your_omdb_key',
     
     // Spotify API - Get from: https://developer.spotify.com/dashboard
-    SPOTIFY_CLIENT_ID: '4acfb5c3c58448a3a6fc909910dc0282',
-    SPOTIFY_CLIENT_SECRET: 'f7fbb11f27954ab08687ff32dfdbecfb',
+    SPOTIFY_CLIENT_ID: 'your_spotify_client_id',
+    SPOTIFY_CLIENT_SECRET: 'your_spotify_client_secret',
     
     // Google Gemini AI - Get from: https://makersuite.google.com/app/apikey
-    GEMINI_API_KEY: 'AIzaSyBtGBG8qmwCafPDbLAD5aEtMeVyodeX22Y',
+    GEMINI_API_KEY: 'your_gemini_api_key',
     
     // Firebase Configuration
     FIREBASE_CONFIG: {
-        apiKey: "AIzaSyAmCKNLQa5D_VTTDApD5KRPGTxTvuMHZu4",
-        authDomain: "mediamate-7be1d.firebaseapp.com",
-        databaseURL: "https://mediamate-7be1d-default-rtdb.firebaseio.com",
-        projectId: "mediamate-7be1d",
-        storageBucket: "mediamate-7be1d.firebasestorage.app",
-        messagingSenderId: "1070130926077",
-        appId: "1:1070130926077:web:781de2dc1275d193af4994",
-        measurementId: "G-BSV2LSNR6D"
+        apiKey: 'your_firebase_api_key',
+        authDomain: 'your_app.firebaseapp.com',
+        databaseURL: 'https://your_app.firebaseio.com',
+        projectId: 'your_project_id',
+        storageBucket: 'your_app.appspot.com',
+        messagingSenderId: 'your_sender_id',
+        appId: 'your_app_id'
     }
 };
 
